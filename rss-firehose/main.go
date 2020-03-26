@@ -13,7 +13,8 @@ import (
 
 func main() {
 	stream_urls := []string{
-		"http://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml",
+		"http://feeds.bbci.co.uk/news/world/rss.xml",
+		"http://feeds.bbci.co.uk/news/rss.xml",
 		"http://feeds.reuters.com/reuters/topNews?format=xml",
 		"https://feeds.skynews.com/feeds/rss/world.xml",
 		"https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",

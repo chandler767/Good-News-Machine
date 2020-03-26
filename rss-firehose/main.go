@@ -1,11 +1,12 @@
-// Stream randomly sorted rss feeds to PubNub
+// Stream random articles to PubNub
 
 package main
 
 import (
-	//pubnub "github.com/pubnub/go"
-	"fmt"
+	"encoding/json"
+	//"fmt"
 	"github.com/mmcdole/gofeed"
+	pubnub "github.com/pubnub/go"
 	"math/rand"
 	"time"
 )
@@ -20,21 +21,28 @@ func main() {
 		"http://rss.cnn.com/rss/cnn_topstories.rss",
 		"http://rss.cnn.com/rss/cnn_world.rss",
 	}
-	/*config := pubnub.NewConfig()
+	config := pubnub.NewConfig()
 	config.PublishKey = "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149"
 	config.SubscribeKey = "sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302"
 	channel := "news_stream"
 	pn := pubnub.NewPubNub(config)
-	pn.Publish().Channel(channel).Message("").Execute()*/
 	for {
 		rand.Seed(time.Now().Unix())
 		fp := gofeed.NewParser()
 		feed, err := fp.ParseURL(stream_urls[rand.Intn(len(stream_urls))])
-		if err != nil {
-			panic(err)
+		if err != nil { // Parse failied
+			time.Sleep(2 * time.Second) // Send random news every 2 seconds
+			return
 		}
-		fmt.Println(feed.Title)
 
+		//fmt.Println(feed.Items[rand.Intn(len(feed.Items))].Title)
+		news_item, err := json.Marshal(feed.Items[rand.Intn(len(feed.Items))])
+		if err != nil {
+			time.Sleep(2 * time.Second) // Send random news every 2 seconds
+			return
+		}
+
+		pn.Publish().Channel(channel).Message(string(news_item)).Execute()
 		time.Sleep(2 * time.Second) // Send random news every 2 seconds
 	}
 }

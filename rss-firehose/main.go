@@ -17,8 +17,13 @@ func main() {
 		"https://feeds.skynews.com/feeds/rss/world.xml",
 		"https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
 		"https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
-		"http://rss.cnn.com/rss/cnn_topstories.rss",
-		"http://rss.cnn.com/rss/cnn_world.rss",
+		"https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+		"http://feeds.washingtonpost.com/rss/world",
+		"https://www.huffpost.com/section/front-page/feed",
+		"https://abcnews.go.com/abcnews/topstories",
+		"https://nypost.com/feed/",
+		"https://www.newyorker.com/feed/everything",
+		"https://www.vox.com/rss/index.xml",
 	}
 	config := pubnub.NewConfig()
 	config.PublishKey = "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149"
@@ -30,10 +35,10 @@ func main() {
 		fp := gofeed.NewParser()
 		feed, err := fp.ParseURL(stream_urls[rand.Intn(len(stream_urls))])
 		if err != nil { // Parse failied
-			time.Sleep(2 * time.Second) // Send random news every 2 seconds
+			time.Sleep(1 * time.Second) // Send random news every 1 seconds
 			return
 		}
 		pn.Publish().Channel(channel).Message(feed.Items[rand.Intn(len(feed.Items))]).Execute()
-		time.Sleep(2 * time.Second) // Send random news every 2 seconds
+		time.Sleep(1 * time.Second) // Send random news every 1 seconds
 	}
 }

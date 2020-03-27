@@ -3,8 +3,6 @@
 package main
 
 import (
-	"encoding/json"
-	//"fmt"
 	"github.com/mmcdole/gofeed"
 	pubnub "github.com/pubnub/go"
 	"math/rand"
@@ -35,15 +33,7 @@ func main() {
 			time.Sleep(2 * time.Second) // Send random news every 2 seconds
 			return
 		}
-
-		//fmt.Println(feed.Items[rand.Intn(len(feed.Items))].Title)
-		news_item, err := json.Marshal(feed.Items[rand.Intn(len(feed.Items))])
-		if err != nil {
-			time.Sleep(2 * time.Second) // Send random news every 2 seconds
-			return
-		}
-
-		pn.Publish().Channel(channel).Message(string(news_item)).Execute()
+		pn.Publish().Channel(channel).Message(feed.Items[rand.Intn(len(feed.Items))]).Execute()
 		time.Sleep(2 * time.Second) // Send random news every 2 seconds
 	}
 }

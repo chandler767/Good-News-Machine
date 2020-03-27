@@ -306,7 +306,7 @@ export default (request) => {
         return new RequestSigner(request, credentials).sign()
     }
     
-    const cycleDuration = 30; // How often to change the featured post
+    const cycleDuration = 180; // How often to change the featured post
     const resetVoteAvg = 86400; // How often to reset the vote average
     const currentTime = Math.round(Date.now() / 1000);
     return kvstore.get('post_queue').then((value) => {
@@ -348,7 +348,7 @@ export default (request) => {
                         console.log(sentiment);
                         if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish
                             pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
-                            const featured_vote_id = utils.randomInt(10000000, 100000000000).toString();
+                            const featured_vote_id = utils.randomInt(9999999999, 999999999999999).toString(); 
                             const new_featured  = {
                                 "published": currentTime, //let the frontend know when to cycle posts.
                                 "cycle": cycleDuration,

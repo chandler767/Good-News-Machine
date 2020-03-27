@@ -319,8 +319,6 @@ export default (request) => {
         var avgVoteAge = value.avg_vote_age;
         if ((currentTime - postBuffer) > cycleDuration) {
             const payload = request.message;
-            const new_post = JSON.parse(payload)
-            console.log(payload);
             return vault.get('AWS_access_key').then((AWS_access_key) => {
                 return vault.get('AWS_secret_key').then((AWS_secret_key) => {
                     var awsCreds = {accessKeyId: AWS_access_key, secretAccessKey: AWS_secret_key};
@@ -333,7 +331,7 @@ export default (request) => {
                             'X-Amz-Target': 'Comprehend_20171127.DetectSentiment'
                         },
                         host: 'comprehend.us-east-2.amazonaws.com',
-                        body: '{"Text": "' + new_post.title + '", "LanguageCode":"en"}'
+                        body: '{"Text": "' + payload.title + '", "LanguageCode":"en"}'
                     };
                     
                     var s1 = signAWS(sentimentOpts, awsCreds);
@@ -346,11 +344,11 @@ export default (request) => {
                     
                     return xhr.fetch('https://' + sentimentOpts.host, sentimentHttp_options)
                     .then(function (response) {
-                        console.log(payload.text);
                         var sentiment = JSON.parse(response.body)
+                        console.log(sentiment);
                         if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish
                             pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
-                            const featured_vote_id = utils.randomInt(10000000, 100000000000);
+                            const featured_vote_id = utils.randomInt(10000000, 100000000000).toString();
                             const new_featured  = {
                                 "published": currentTime, //let the frontend know when to cycle posts.
                                 "cycle": cycleDuration,
@@ -369,33 +367,37 @@ export default (request) => {
                                 staged_post: payload
                             });
                             
-                            kvstore.set(featured_vote_id.toString(), {
-                                votes: 0
+                            kvstore.set(featured_vote_id, {
+                                votes: 1
                             });
-                            
+
                             if ((currentTime - avgVoteAge) > resetVoteAvg) { // Reset vote avg.
                                 avgVoteAge = currentTime;
                                 avgVote = 0;
                             }
-                            
-                            if (featuredLast != "undefined" ) {
-                                return kvstore.get(featuredVoteID.toString()).then((value) => {
+
+                            if (featuredVoteID != "undefined" ) {
+                                return kvstore.get(featuredVoteID).then((value) => {
                                     const featuredVotes = value.votes;
                                     pubnub.history({
                                         channel: 'top_voted',
                                         count: 5 // how many items to fetch
                                     }).then((response) => {
+                                        const new_top  = {
+                                            "votes": featuredVotes,
+                                            "vote_id": featuredVoteID,
+                                            "post": featuredLast,
+                                        };
                                         if (response.messages == "undefined" || response.messages.length < 5) {
-                                            pubnub.publish({ message: featuredVotes+":"+featuredLast.toString(), channel: "top_voted" }); // Publish to top_voted
+                                            pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
                                             avgVote = ((avgVote + featuredVotes)/2);
-                                            return request.ok();
                                         } else {
                                             if (featuredVotes > avgVote) { // Published to top_voted channel
-                                                pubnub.publish({ message: featuredVotes+":"+featuredLast.toString(), channel: "top_voted" }); // Publish to top_voted
+                                                pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
                                                 avgVote = ((avgVote + featuredVotes)/2);
-                                                return request.ok();
                                             }
                                         }
+                                        return request.ok();
                                     }).catch((error) => {
                                         console.log(error)
                                         return request.ok();
@@ -407,7 +409,6 @@ export default (request) => {
                                 });
                             }
                         }
-                        console.log(sentiment);
                         return request.ok();
                     }).catch(function (error) {
                         console.log(error);
@@ -422,7 +423,7 @@ export default (request) => {
         console.log(e);
         kvstore.set('post_queue', {
             post_buffer: 0,
-            featured_vote_id: 0,
+            featured_vote_id: "",
             featured_last: "",
             avg_vote: 0,
             avg_vote_age: 0,

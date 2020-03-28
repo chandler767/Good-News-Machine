@@ -37,7 +37,7 @@ func main() {
 		"https://www.cbsnews.com/latest/rss/world",
 		"http://feeds.feedburner.com/daily-express-world-news",
 		"https://www.mirror.co.uk/news/world-news/?service=rss",
-		"https://www.latimes.com/world/rss2.0.xml"
+		"https://www.latimes.com/world/rss2.0.xml",
 	}
 	config := pubnub.NewConfig()
 	config.PublishKey = "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149"

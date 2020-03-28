@@ -90,7 +90,11 @@ function refreshPosts() {
 				});
 				console.log(response.messages[0].entry.featured_vote_id);
 				current_voteid = response.messages[0].entry.featured_vote_id;
-				document.getElementById('featured-story').innerHTML = "<h1>"+response.messages[0].entry.featured.title+"</h1><h2>"+response.messages[0].entry.featured.description+"</h2><h3><a href=\""+response.messages[0].entry.featured.link+"\" target=\"_blank\">"+response.messages[0].entry.featured.link+"</a></h3><div id=featured-votes><p>⭐ "+current_votecount+" Votes</p></div>";
+				let description = "";
+				if (typeof response.messages[0].entry.featured.description != "undefined") {
+					description = response.messages[0].entry.featured.description;
+				}
+				document.getElementById('featured-story').innerHTML = "<h1>"+response.messages[0].entry.featured.title+"</h1><h2>"+description+"</h2><h3><a href=\""+response.messages[0].entry.featured.link+"\" target=\"_blank\">"+response.messages[0].entry.featured.link+"</a></h3><div id=featured-votes><p>⭐ "+current_votecount+" Votes</p></div>";
 			    console.log(response.messages[0]);
 			} else {
 				document.getElementById('featured-story').innerHTML = "<h1>Unable to get featured post ):</h1>";
@@ -107,7 +111,7 @@ function refreshPosts() {
 	    },
 	    function (status, response) {
 	    	let displayed = 0;
-	    	if (response.messages != "undefined" && response.messages.length > 0) {
+	    	if (typeof response.messages !== "undefined" && response.messages.length > 0) {
 
 	    		document.getElementById('top-story-group').innerHTML = "";
 	    		var top_posts_body = ""
@@ -124,7 +128,11 @@ function refreshPosts() {
 						if (displayed < 5) {
 							if (response.messages[i].entry.vote_id != current_voteid) {
 								displayed = displayed+1;
-								top_posts_body = top_posts_body + "<div class=\"top-story\"><h2><a href=\""+response.messages[i].entry.post.link+"\" target=\"_blank\">🔗"+response.messages[i].entry.post.title.substring(0,100)+"</a></h2><h3>"+response.messages[i].entry.post.description+"</h3><p>⭐ "+response.messages[i].entry.votes+" Votes</p></div>"
+								let description = "";
+								if (response.messages[i].entry.post.description !== undefined) {
+									description = response.messages[i].entry.post.description;
+								}
+								top_posts_body = top_posts_body + "<div class=\"top-story\"><h2><a href=\""+response.messages[i].entry.post.link+"\" target=\"_blank\">🔗"+response.messages[i].entry.post.title.substring(0,100)+"</a></h2><h3>"+description+"</h3><p>⭐ "+response.messages[i].entry.votes+" Votes</p></div>"
 							}
 						}
 					}

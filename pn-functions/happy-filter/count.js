@@ -1,6 +1,5 @@
 export default (request, response) => {
     const kvstore = require('kvstore');
-    const pubnub = require('pubnub');
 
     let paramsObject = request.params;
     console.log('request', request); // Log the request envelope passed
@@ -12,12 +11,8 @@ export default (request, response) => {
     }
 
    	return kvstore.get(paramsObject.voteid).then((value) => {
-        kvstore.set(paramsObject.voteid, { 
-        	votes:(value.votes+1) // Count vote
-        });
-        pubnub.publish({ message: "+1", channel: paramsObject.voteid }); // Stream new votes so dashboards can keep a real time count.
         response.status = 200;
-		return response.send("Vote accepted."); // (: 
+		return response.send(value.votes); // (:
 	}).catch((error) => {
         console.log(error);
         response.status = 400;

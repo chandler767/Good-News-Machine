@@ -1,0 +1,143 @@
+
+#left-sidebar {
+    background-color: #EFEFEF;
+    grid-area: lsidebar;
+}
+
+#content {
+    grid-area: content;
+    position: top;
+    font-family: sans-serif;
+    background-color: #313131;
+    color: #FFFFFF;
+    margin-bottom: 0px;
+    text-align: center;
+    align-items: center;
+}
+
+#chat-content {
+    background-color: #EFEFEF;
+    padding-bottom: 20px;
+}
+
+#wrapper {
+    display: grid;
+    grid-template-columns: 300px auto;
+    grid-template-areas: 'header header ' 'lsidebar content '  'footer footer ';
+}
+
+#featured-story > h3 > a {
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+#featured-vote {
+    background-color: #DCDCDC;
+}
+
+#featured-vote > button {
+    font-size: 3em;
+    background-color: #DCDCDC;
+    padding: -15px;
+    border-width: 0px;
+}
+
+#top-story-header {
+    text-align: center;
+    outline-style: solid;
+    outline-offset: -10px;
+}
+
+#top-story-header > h1 {
+    font-size: 1.3em;
+    padding: 20px 20px 20px 20px
+}
+
+#top-story-header > p {
+    font-size: 1em;
+    padding: 10px 10px 10px 10px
+}
+
+.top-story {
+    text-align: center;
+    outline-style: solid;
+    outline-offset: -10px;
+    padding: 5px 10px 5px 10px;
+}
+
+.top-story > h2 {
+    padding: 0px 0px 0px 0px;
+    font-size: 1em;
+}
+
+.top-story > h3 {
+    padding: 0px 0px 0px 0px;
+    font-size: .8em;
+}
+
+.top-story > p {
+    padding: 0px 0px 0px 0px;
+    font-size: .8em;
+}
+
+.top-story > h2 > a {
+    color: #000000;
+    text-decoration: none;
+}
+
+
+.base-timer {
+    position: relative;
+    width: 75px;
+    height: 75px;
+    margin: 0 auto;
+}
+
+.base-timer__svg {
+  transform: scaleX(-1);
+}
+
+.base-timer__circle {
+  fill: none;
+  stroke: none;
+}
+
+.base-timer__path-elapsed {
+  stroke-width: 7px;
+  stroke: grey;
+}
+
+.base-timer__path-remaining {
+  stroke-width: 7px;
+  stroke-linecap: round;
+  transform: rotate(90deg);
+  transform-origin: center;
+  transition: 1s linear all;
+  fill-rule: nonzero;
+  stroke: currentColor;
+}
+
+.base-timer__path-remaining.green {
+  color: rgb(65, 184, 131);
+}
+
+.base-timer__path-remaining.orange {
+  color: orange;
+}
+
+.base-timer__path-remaining.red {
+  color: red;
+}
+
+.base-timer__label {
+    position: absolute;
+    width: 75px;
+    height: 75px;
+    margin: 0 auto;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+}
+

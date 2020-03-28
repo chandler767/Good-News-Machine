@@ -299,8 +299,18 @@ export default (request) => {
             
         return path
     }
-    
-    
+
+    function generateHash(string) {
+        var hash = 0;
+        if (string.length == 0)
+            return hash;
+        for (let i = 0; i < string.length; i++) {
+            var charCode = string.charCodeAt(i);
+            hash = ((hash << 7) - hash) + charCode;
+            hash = hash & hash;
+        }
+        return hash;
+    }
     
     function signAWS(request, credentials) {
         return new RequestSigner(request, credentials).sign()
@@ -348,7 +358,7 @@ export default (request) => {
                         console.log(sentiment);
                         if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish
                             pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
-                            const featured_vote_id = utils.randomInt(9999999999, 999999999999999).toString(); 
+                            const featured_vote_id = generateHash(payload.toString()).toString(); 
                             const new_featured  = {
                                 "published": currentTime, //let the frontend know when to cycle posts.
                                 "cycle": cycleDuration,

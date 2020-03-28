@@ -323,6 +323,7 @@ export default (request) => {
         // Check if the buffer is ready for a new post
         const postBuffer = value.post_buffer;
         const stagedPost = value.staged_post;
+        const stagedPostVoteID = value.staged_post_vote_id;
         const featuredVoteID = value.featured_vote_id;
         const featuredLast = value.featured_last;
         var avgVote = value.avg_vote;
@@ -357,27 +358,29 @@ export default (request) => {
                         var sentiment = JSON.parse(response.body)
                         console.log(sentiment);
                         if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish
-                            pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
-                            const featured_vote_id = generateHash(payload.toString()).toString(); 
+                           // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
+                            const staged_vote_id = generateHash(payload.title.toString()).toString(); 
                             const new_featured  = {
                                 "published": currentTime, //let the frontend know when to cycle posts.
                                 "cycle": cycleDuration,
                                 "featured": stagedPost,
-                                "featured_vote_id": featured_vote_id,
-                                "staged": payload
+                                "featured_vote_id": stagedPostVoteID,
+                                "staged": payload,
+                                "staged_post_vote_id": staged_vote_id
                             };
                             
                             pubnub.publish({ message: new_featured, channel: "news_stream_featured" }); // Publish to featured feed
                             kvstore.set('post_queue', {
                                 post_buffer: currentTime+cycleDuration, // How often to stage a new post to be featured.
-                                featured_vote_id: featured_vote_id,
+                                featured_vote_id: stagedPostVoteID,
                                 featured_last: stagedPost,
                                 avg_vote: avgVote,
                                 avg_vote_age: avgVoteAge,
-                                staged_post: payload
+                                staged_post: payload,
+                                staged_post_vote_id: staged_vote_id
                             });
                             
-                            kvstore.set(featured_vote_id, {
+                            kvstore.set(staged_vote_id, {
                                 votes: 1
                             });
 
@@ -437,7 +440,8 @@ export default (request) => {
             featured_last: "",
             avg_vote: 0,
             avg_vote_age: 0,
-            staged_post: ""
+            staged_post: "",
+            staged_post_vote_id: ""
         });
         return request.ok();
     });

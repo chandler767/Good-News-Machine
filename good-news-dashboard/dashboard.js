@@ -16,14 +16,15 @@ const COLOR_CODES = {
   }
 };
 
-let current_voteid;
-let current_votecount;
+let currentVoteID;
+let currentVoteCount;
 
 let timeLimit = 300;
 let timePassed = 0;
 let timeLeft = timeLimit;
 let timerInterval = null;
 let remainingPathColor = COLOR_CODES.info.color;
+let shownStaged = false;
 
 var pubnub = new PubNub({
 	publishKey: "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149",
@@ -32,24 +33,22 @@ var pubnub = new PubNub({
 
 pubnub.addListener({
 	message: function(message) {
-		current_votecount = parseInt(current_votecount, 10)+1;
-		document.getElementById('featured-votes').innerHTML = "<p>⭐ "+current_votecount+" Votes</p>";
+		currentVoteCount = parseInt(currentVoteCount, 10)+1;
+		document.getElementById('featured-votes').innerHTML = "<p>⭐ "+currentVoteCount+" Votes</p>";
 	},
 })
 
 function publishVote() { // Publish vote
-	let xhr = new XMLHttpRequest();
-	xhr.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/vote?voteid='+current_voteid, false);
-	try {
-	  xhr.send();
-	  if (xhr.status != 200) {
-	    console.log(`Error ${xhr.status}: ${xhr.statusText}`);
-	  } else {
-	   	// ToDo : animate emoji
-	  }
-	} catch(err) { // instead of onerror
-	  console.log("Request failed");
-	}
+	let request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            // ToDo : animate emoji
+        } else {
+        	console.log("Vote failed");
+        }
+    };
+    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/vote?voteid='+currentVoteID);
+    request.send();
    
 };
 
@@ -64,36 +63,44 @@ function refreshPosts() {
 	    },
 	    function (status, response) {
 	    	if (response.messages != "undefined" && response.messages.length > 0) {
+	    		console.log(response);
 	    		document.getElementById('featured-story').innerHTML = "";
 	    		timeLimit = response.messages[0].entry.cycle;
 	    		timeLeft = timeLimit;
+	    		let activeFeaturedPost = response.messages[0].entry.featured;
+	    		currentVoteID = response.messages[0].entry.featured_vote_id;
 	    		timePassed = (Math.round((new Date()).getTime() / 1000) - response.messages[0].entry.published);
-	    		if (timePassed >= timeLimit) {
+	    		if (timePassed >= timeLimit) { // Rotate to posts if a new post is not yet ready. 
+	    			if (shownStaged == false) {
+	    				activeFeaturedPost = response.messages[0].entry.staged;
+	    				currentVoteID = response.messages[0].entry.staged_post_vote_id;
+	    				shownStaged = true;
+	    			} else {
+	    				shownStaged = false;
+	    			}
 	    			timePassed = 0;
 	    		}
-	    		startTimer();
-	    		let xhr = new XMLHttpRequest();
 
-				xhr.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+response.messages[0].entry.featured_vote_id, false);
-				try {
-				  xhr.send();
-				  if (xhr.status != 200) {
-				    console.log(`Error ${xhr.status}: ${xhr.statusText}`);
-				  } else {
-				   	current_votecount = xhr.response;
-				  }
-				} catch(err) { // instead of onerror
-				  console.log("Request failed");
-				}
-				pubnub.subscribe({
-				    channels: [response.messages[0].entry.featured_vote_id],
-				});
-				current_voteid = response.messages[0].entry.featured_vote_id;
-				let description = "";
-				if (typeof response.messages[0].entry.featured.description != "undefined") {
-					description = response.messages[0].entry.featured.description;
-				}
-				document.getElementById('featured-story').innerHTML = "<h1>"+response.messages[0].entry.featured.title+"</h1><h2>"+description+"</h2><h3><a href=\""+response.messages[0].entry.featured.link+"\" target=\"_blank\">"+response.messages[0].entry.featured.link+"</a></h3><div id=featured-votes><p>⭐ "+current_votecount+" Votes</p></div>";
+	    		let request = new XMLHttpRequest();
+			    request.onreadystatechange = function() {
+			        if (this.readyState == 4 && this.status == 200) {
+			            currentVoteCount = this.responseText;
+			        } else {
+			        	currentVoteCount = 0;
+			        }
+			        pubnub.subscribe({
+					    channels: [currentVoteID],
+					});
+					let description = "";
+					if (typeof activeFeaturedPost.description != "undefined") {
+						description = activeFeaturedPost.description;
+					}
+					document.getElementById('featured-story').innerHTML = "<h1>"+activeFeaturedPost.title+"</h1><h2>"+description+"</h2><h3><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\">"+activeFeaturedPost.link+"</a></h3><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
+			    };
+			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
+			    request.send();
+
+			    startTimer();
 			} else {
 				document.getElementById('featured-story').innerHTML = "<h1>Unable to get featured post ):</h1>";
 			}
@@ -104,7 +111,7 @@ function refreshPosts() {
 	pubnub.history(
 	    {
 	        channel: 'top_voted',
-	        count: 20, // how many items to fetch
+	        count: 10, // how many items to fetch
 	    },
 	    function (status, response) {
 	    	let displayed = 0;
@@ -113,17 +120,17 @@ function refreshPosts() {
 	    		document.getElementById('top-story-group').innerHTML = "";
 	    		var top_posts_body = ""
 				for (var i = 0; i < response.messages.length; i++) {
-					var post_org = true;
+					let post_org = true;
 					for (var u = 0; u < response.messages.length; u++) {
 						if (i != u) {
-							if (response.messages[i].entry.post.title.substring(0,100) == response.messages[u].entry.post.title.substring(0,100)) {
+							if (response.messages[i].entry.vote_id == response.messages[u].entry.post.vote_id) {
 								post_org = false;
 							}
 						}
 					};
 					if (post_org != false) {
 						if (displayed < 5) {
-							if (response.messages[i].entry.vote_id != current_voteid) {
+							if (response.messages[i].entry.vote_id != currentVoteID) {
 								displayed = displayed+1;
 								let description = "";
 								if (response.messages[i].entry.post.description !== undefined) {

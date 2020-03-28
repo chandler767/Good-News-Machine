@@ -123,7 +123,7 @@ function refreshPosts() {
 					let post_org = true;
 					for (var u = 0; u < response.messages.length; u++) {
 						if (i != u) {
-							if (response.messages[i].entry.vote_id == response.messages[u].entry.post.vote_id) {
+							if ((response.messages[i].entry.vote_id == response.messages[u].entry.post.vote_id) || (response.messages[i].entry.post.title.substring(0,100) == response.messages[u].entry.post.title.substring(0,100))) {
 								post_org = false;
 							}
 						}

@@ -35,10 +35,10 @@ func main() {
 		fp := gofeed.NewParser()
 		feed, err := fp.ParseURL(stream_urls[rand.Intn(len(stream_urls))])
 		if err != nil { // Parse failied
-			time.Sleep(1 * time.Second) // Send random news every 1 seconds
+			time.Sleep(rand.Intn(8) * time.Second) // Send random news every few seconds
 			return
 		}
 		pn.Publish().Channel(channel).Message(feed.Items[rand.Intn(len(feed.Items))]).Execute()
-		time.Sleep(1 * time.Second) // Send random news every 1 seconds
+		time.Sleep(rand.Intn(8) * time.Second) // Send random news every few seconds
 	}
 }

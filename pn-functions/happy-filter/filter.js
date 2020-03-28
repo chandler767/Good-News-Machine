@@ -316,7 +316,7 @@ export default (request) => {
         return new RequestSigner(request, credentials).sign()
     }
     
-    const cycleDuration = 180; // How often to change the featured post
+    const cycleDuration = 300; // How often to change the featured post
     const resetVoteAvg = 86400; // How often to reset the vote average
     const currentTime = Math.round(Date.now() / 1000);
     return kvstore.get('post_queue').then((value) => {

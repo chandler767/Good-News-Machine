@@ -19,7 +19,7 @@ const COLOR_CODES = {
 let current_voteid;
 let current_votecount;
 
-let timeLimit = 180;
+let timeLimit = 300;
 let timePassed = 0;
 let timeLeft = timeLimit;
 let timerInterval = null;
@@ -54,13 +54,13 @@ function publishVote() { // Publish vote
 };
 
 function refreshPosts() {
+	console.log("refreshing posts");
 	pubnub.unsubscribeAll();
 	// Get featured post
 	pubnub.history(
 	    {
 	        channel: 'news_stream_featured',
 	        count: 1, // how many items to fetch
-	        stringifiedTimeToken: true, // false is the default
 	    },
 	    function (status, response) {
 	    	if (response.messages != "undefined" && response.messages.length > 0) {
@@ -88,14 +88,12 @@ function refreshPosts() {
 				pubnub.subscribe({
 				    channels: [response.messages[0].entry.featured_vote_id],
 				});
-				console.log(response.messages[0].entry.featured_vote_id);
 				current_voteid = response.messages[0].entry.featured_vote_id;
 				let description = "";
 				if (typeof response.messages[0].entry.featured.description != "undefined") {
 					description = response.messages[0].entry.featured.description;
 				}
 				document.getElementById('featured-story').innerHTML = "<h1>"+response.messages[0].entry.featured.title+"</h1><h2>"+description+"</h2><h3><a href=\""+response.messages[0].entry.featured.link+"\" target=\"_blank\">"+response.messages[0].entry.featured.link+"</a></h3><div id=featured-votes><p>⭐ "+current_votecount+" Votes</p></div>";
-			    console.log(response.messages[0]);
 			} else {
 				document.getElementById('featured-story').innerHTML = "<h1>Unable to get featured post ):</h1>";
 			}
@@ -106,8 +104,7 @@ function refreshPosts() {
 	pubnub.history(
 	    {
 	        channel: 'top_voted',
-	        count: 10, // how many items to fetch
-	        stringifiedTimeToken: true, // false is the default
+	        count: 20, // how many items to fetch
 	    },
 	    function (status, response) {
 	    	let displayed = 0;

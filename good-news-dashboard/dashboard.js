@@ -48,14 +48,13 @@ function emojiAnimate(emoji){
 	var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 	var div = document.createElement("div");
 	div.className = "emoji";
-	console.log(emoji);
-	if (message.message == "1") {
+	if (emoji == "1") {
 		div.innerHTML = "<h1>😀</h1>";
-	} else if (message.message == "2") {
+	} else if (emoji == "2") {
 		div.innerHTML = "<h1>❤️</h1>";
-	} else if (message.message == "3") {
+	} else if (emoji == "3") {
 		div.innerHTML = "<h1>⭐</h1>";
-	} else if (message.message == "4") {
+	} else if (emoji == "4") {
 		div.innerHTML = "<h1>🏆</h1>";
 	} else {
 		div.innerHTML = "<h1>⭐</h1>";

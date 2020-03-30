@@ -328,7 +328,6 @@ export default (request) => {
         const featuredLast = value.featured_last;
         var avgVote = value.avg_vote;
         var avgVoteAge = value.avg_vote_age;
-        console.log(currentTime - postBuffer);
         if ((currentTime - postBuffer) > cycleDuration) {
             const payload = request.message;
             return vault.get('AWS_access_key').then((AWS_access_key) => {
@@ -412,8 +411,13 @@ export default (request) => {
                                             }
                                         }
                                         kvstore.set('post_queue', {
+                                            post_buffer: currentTime+cycleDuration, // How often to stage a new post to be featured.
+                                            featured_vote_id: stagedPostVoteID,
+                                            featured_last: stagedPost,
                                             avg_vote: avgVote,
                                             avg_vote_age: avgVoteAge,
+                                            staged_post: payload,
+                                            staged_post_vote_id: staged_vote_id
                                         });
                                         return request.ok();
                                     }).catch((error) => {

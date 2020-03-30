@@ -51,9 +51,8 @@ func main() {
 			time.Sleep(time.Duration(rand.Int31n(5)) * time.Second) // Send random news every few seconds
 			return
 		}
-		if val, ok := feed.Items[rand.Intn(len(feed.Items))]; ok {
-			pn.Publish().Channel(channel).Message(val).Execute()
-		}
+		_, ok := feed.Items[rand.Intn(len(feed.Items))]
+		pn.Publish().Channel(channel).Message(feed.Items[rand.Intn(len(feed.Items))]).Execute()
 		time.Sleep(time.Duration(rand.Int31n(5)) * time.Second) // Send random news every few seconds
 	}
 }

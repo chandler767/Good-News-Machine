@@ -37,7 +37,7 @@
 }
 
 #featured-vote > button {
-    font-size: 3em;
+    font-size: 50px;
     background-color: #DCDCDC;
     padding: -15px;
     border-width: 0px;
@@ -54,12 +54,12 @@
 }
 
 #top-story-header > h1 {
-    font-size: 1.3em;
+    font-size: 24px;
     padding: 20px 20px 20px 20px
 }
 
 #top-story-header > p {
-    font-size: 1em;
+    font-size: 14px;
     padding: 10px 10px 10px 10px
 }
 
@@ -78,17 +78,17 @@
 
 .top-story > h2 {
     padding: 0px 0px 0px 0px;
-    font-size: 1em;
+    font-size: 24px;
 }
 
 .top-story > h3 {
     padding: 0px 0px 0px 0px;
-    font-size: .8em;
+    font-size: 15px;
 }
 
 .top-story > p {
     padding: 0px 0px 0px 0px;
-    font-size: .8em;
+    font-size: 18px;
 }
 
 .top-story > h2 > a {

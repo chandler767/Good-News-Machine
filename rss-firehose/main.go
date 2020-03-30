@@ -30,7 +30,6 @@ func main() {
 		"https://www.reddit.com/r/worldnews/.rss",
 		"https://www.globalissues.org/news/feed",
 		"https://www.yahoo.com/news/rss/world",
-		"https://www.rt.com/rss/news/",
 		"https://www.cnbc.com/id/100727362/device/rss/rss.html",
 		"http://feeds.feedburner.com/time/world",
 		"https://abcnews.go.com/abcnews/internationalheadlines",

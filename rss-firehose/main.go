@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/mmcdole/gofeed"
 	pubnub "github.com/pubnub/go"
 	"math/rand"
@@ -50,7 +49,6 @@ func main() {
 		feed, err := fp.ParseURL(stream_urls[rand.Intn(len(stream_urls))])
 		if err != nil { // Parse failied
 			time.Sleep(time.Duration(rand.Int31n(7)) * time.Second) // Send random news every few seconds
-
 		}
 		pn.Publish().Channel(channel).Message(feed.Items[rand.Intn(len(feed.Items))]).Execute()
 		time.Sleep(time.Duration(rand.Int31n(7)) * time.Second) // Send random news every few seconds

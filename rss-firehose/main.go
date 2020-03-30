@@ -19,7 +19,7 @@ func main() {
 		"https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
 		"https://feeds.a.dj.com/rss/RSSWorldNews.xml",
 		"http://feeds.washingtonpost.com/rss/world",
-		"https://www.huffpost.com/section/front-page/feed",
+		"https://www.reddit.com/r/UpliftingNews/.rss",
 		"https://abcnews.go.com/abcnews/topstories",
 		"https://nypost.com/feed/",
 		"https://www.newyorker.com/feed/everything",

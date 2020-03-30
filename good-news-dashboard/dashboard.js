@@ -25,6 +25,7 @@ let timeLeft = timeLimit;
 let timerInterval = null;
 let remainingPathColor = COLOR_CODES.info.color;
 let shownStaged = false;
+let shownEmoji = true;
 
 var pubnub = new PubNub({
 	publishKey: "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149",
@@ -35,28 +36,36 @@ pubnub.addListener({
 	message: function(message) {
 		currentVoteCount = parseInt(currentVoteCount, 10)+1;
 		document.getElementById('featured-votes').innerHTML = "<p>⭐ "+currentVoteCount+" Votes</p>";
-		var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-		var div = document.createElement("div");
-		div.className = "emoji";
-		console.log(message.message);
-		if (message.message == "1") {
-			div.innerHTML = "<h1>😀</h1>";
-		} else if (message.message == "2") {
-			div.innerHTML = "<h1>❤️</h1>";
-		} else if (message.message == "3") {
-			div.innerHTML = "<h1>⭐</h1>";
-		} else if (message.message == "4") {
-			div.innerHTML = "<h1>🏆</h1>";
+		if (shownEmoji) {
+			emojiAnimate(message.message);
 		} else {
-			div.innerHTML = "<h1>⭐</h1>";
+			shownEmoji = true;
 		}
-		div.style.position = "absolute";
-		div.style.bottom = "-100%"; 
-		div.style.left = Math.floor(Math.random() * width)+"px";
-		document.getElementById('wrapper').append(div);
-		animateUp(div)
 	},
 })
+
+function emojiAnimate(emoji){
+	var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+	var div = document.createElement("div");
+	div.className = "emoji";
+	console.log(emoji);
+	if (message.message == "1") {
+		div.innerHTML = "<h1>😀</h1>";
+	} else if (message.message == "2") {
+		div.innerHTML = "<h1>❤️</h1>";
+	} else if (message.message == "3") {
+		div.innerHTML = "<h1>⭐</h1>";
+	} else if (message.message == "4") {
+		div.innerHTML = "<h1>🏆</h1>";
+	} else {
+		div.innerHTML = "<h1>⭐</h1>";
+	}
+	div.style.position = "absolute";
+	div.style.bottom = "-100%"; 
+	div.style.left = Math.floor(Math.random() * width)+"px";
+	document.getElementById('wrapper').append(div);
+	animateUp(div)
+}
 
 function animateUp(elem) {
   var pos =-125;
@@ -76,7 +85,8 @@ function publishVote(emoji) { // Publish vote
 	let request = new XMLHttpRequest();
     request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/vote?voteid='+currentVoteID+'&emoji='+emoji);
     request.send();
-   
+    shownEmoji = false;
+    emojiAnimate(emoji);   
 };
 
 function refreshPosts() {

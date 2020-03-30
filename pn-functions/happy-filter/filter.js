@@ -321,14 +321,18 @@ export default (request) => {
     const currentTime = Math.round(Date.now() / 1000);
     return kvstore.get('post_queue').then((value) => {
         // Check if the buffer is ready for a new post
-        const postBuffer = value.post_buffer;
+        var postBuffer = value.post_buffer;
         const stagedPost = value.staged_post;
         const stagedPostVoteID = value.staged_post_vote_id;
         const featuredVoteID = value.featured_vote_id;
         const featuredLast = value.featured_last;
         var avgVote = value.avg_vote;
         var avgVoteAge = value.avg_vote_age;
-        if ((currentTime - postBuffer) > cycleDuration) {
+        if (postBuffer == 0) {
+            postBuffer = currentTime-cycleDuration;
+        }
+        console.log(currentTime - postBuffer);
+        if ((currentTime - postBuffer) >= cycleDuration) {
             const payload = request.message;
             return vault.get('AWS_access_key').then((AWS_access_key) => {
                 return vault.get('AWS_secret_key').then((AWS_secret_key) => {
@@ -371,7 +375,7 @@ export default (request) => {
                             
                             pubnub.publish({ message: new_featured, channel: "news_stream_featured" }); // Publish to featured feed
                             kvstore.set('post_queue', {
-                                post_buffer: (currentTime - (currentTime - postBuffer))+cycleDuration, // How often to stage a new post to be featured.
+                                post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
                                 featured_vote_id: stagedPostVoteID,
                                 featured_last: stagedPost,
                                 avg_vote: avgVote,
@@ -411,7 +415,7 @@ export default (request) => {
                                             }
                                         }
                                         kvstore.set('post_queue', {
-                                            post_buffer: currentTime+cycleDuration, // How often to stage a new post to be featured.
+                                            post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
                                             featured_vote_id: stagedPostVoteID,
                                             featured_last: stagedPost,
                                             avg_vote: avgVote,

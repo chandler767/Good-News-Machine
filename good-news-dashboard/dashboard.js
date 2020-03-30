@@ -35,19 +35,46 @@ pubnub.addListener({
 	message: function(message) {
 		currentVoteCount = parseInt(currentVoteCount, 10)+1;
 		document.getElementById('featured-votes').innerHTML = "<p>⭐ "+currentVoteCount+" Votes</p>";
+		var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		var div = document.createElement("div");
+		div.className = "emoji";
+		console.log(message.message);
+		if (message.message == "1") {
+			div.innerHTML = "<h1>😀</h1>";
+		} else if (message.message == "2") {
+			div.innerHTML = "<h1>❤️</h1>";
+		} else if (message.message == "3") {
+			div.innerHTML = "<h1>⭐</h1>";
+		} else if (message.message == "4") {
+			div.innerHTML = "<h1>🏆</h1>";
+		} else {
+			div.innerHTML = "<h1>⭐</h1>";
+		}
+		div.style.position = "absolute";
+		div.style.bottom = "-100%"; 
+		div.style.left = Math.floor(Math.random() * width)+"px";
+		document.getElementById('wrapper').append(div);
+		animateUp(div)
 	},
 })
 
-function publishVote() { // Publish vote
+function animateUp(elem) {
+  var pos =-125;
+  var id = setInterval(frame, 10);
+  function frame() {
+    if (pos == 125) {
+      clearInterval(id);
+      elem.parentElement.removeChild(elem);
+    } else {
+      pos++;
+      elem.style.bottom = pos + '%';
+    }
+  }
+}
+
+function publishVote(emoji) { // Publish vote
 	let request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            // ToDo : animate emoji
-        } else {
-        	console.log("Vote failed");
-        }
-    };
-    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/vote?voteid='+currentVoteID);
+    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/vote?voteid='+currentVoteID+'&emoji='+emoji);
     request.send();
    
 };
@@ -94,9 +121,9 @@ function refreshPosts() {
 					});
 					let description = "";
 					if (typeof activeFeaturedPost.description != "undefined") {
-						description = activeFeaturedPost.description;
+						description = truncate(activeFeaturedPost.description.replace( /(<([^>]+)>)/ig, ''), 300);
 					}
-					document.getElementById('featured-story').innerHTML = "<h1>"+activeFeaturedPost.title+"</h1><h2>"+description+"</h2><h3><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\">"+activeFeaturedPost.link+"</a></h3><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
+					document.getElementById('featured-story').innerHTML = "<h1>"+truncate(activeFeaturedPost.title, 150)+"</h1><h2>"+description+"</h2><h3><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\">"+activeFeaturedPost.link+"</a></h3><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
 			    };
 			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
 			    request.send();
@@ -112,48 +139,65 @@ function refreshPosts() {
 	pubnub.history(
 	    {
 	        channel: 'top_voted',
-	        reverse: true,
+	        reverse: false,
 	        count: 20, // how many items to fetch
 	    },
 	    function (status, response) {
 	    	let displayed = 0;
-	    	if (typeof response.messages !== "undefined" && response.messages.length > 0) {
-
-	    		document.getElementById('top-story-group').innerHTML = "";
-	    		var top_posts_body = ""
-				for (var i = 0; i < response.messages.length; i++) {
+	    	var topPostMessages = response.messages;
+	    	if (typeof topPostMessages !== "undefined" && topPostMessages.length > 0) {
+	    		let posts = [];
+				for (var i = 0; i < topPostMessages.length; i++) {
 					let post_org = true;
-					for (var u = 0; u < response.messages.length; u++) {
+					for (var u = 0; u < topPostMessages.length; u++) {
 						if (i != u) {
-							if ((response.messages[i].entry.vote_id == response.messages[u].entry.vote_id) || (response.messages[i].entry.post.link == response.messages[u].entry.post.link)) {
+							if ((topPostMessages[i].entry.vote_id == topPostMessages[u].entry.vote_id) || (topPostMessages[i].entry.post.link == topPostMessages[u].entry.post.link)) {
 								post_org = false;
 							}
 						}
 					};
 					if (post_org != false) {
 						if (displayed < 5) {
-							if (response.messages[i].entry.vote_id != currentVoteID) {
+							currentPost = topPostMessages[i].entry;
+							if (currentPost.vote_id != currentVoteID) {
 								displayed = displayed+1;
 								let description = "";
-								if (response.messages[i].entry.post.description !== undefined) {
-									description = response.messages[i].entry.post.description;
+								if (currentPost.post.description !== undefined) {
+									description = truncate(currentPost.post.description.replace( /(<([^>]+)>)/ig, ''), 200);
 								}
-								top_posts_body = top_posts_body + "<div class=\"top-story\"><h2><a href=\""+response.messages[i].entry.post.link+"\" target=\"_blank\">🔗"+response.messages[i].entry.post.title.substring(0,100)+"</a></h2><h3>"+description+"</h3><p>⭐ "+response.messages[i].entry.votes+" Votes</p></div>"
+								let title = truncate(currentPost.post.title, 100);
+								let link = currentPost.post.link;
+								let request = new XMLHttpRequest();
+							    request.onreadystatechange = function() {
+							    	let postVoteCount = 0;
+							        if (this.readyState == 4 && this.status == 200) {
+							            postVoteCount = this.responseText;
+							            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+link+"\" target=\"_blank\">🔗"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
+							        	addToTop(posts.sort(function(a,b) {
+											return a[0]-b[0]
+										}));
+							        }
+							    };
+							    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentPost.vote_id);
+							    request.send();
+
 							}
 						}
 					}
 				}
-			} else {
-				top_posts_body = "Unable to get top posts ):"
-			}
-			document.getElementById('top-story-group').innerHTML = top_posts_body;
+			} 
 	    }
 	);
+}
 
+function addToTop(posts) {
+	document.getElementById('top-story-group').innerHTML = "";
+	for (var i = posts.length-1; i >= 0; i--) {
+		document.getElementById('top-story-group').innerHTML = document.getElementById('top-story-group').innerHTML + posts[i][1];
+	}
 }
 
 refreshPosts();
-
 
 document.getElementById("countdown").innerHTML = `
 <div class="base-timer">
@@ -179,7 +223,21 @@ document.getElementById("countdown").innerHTML = `
 </div>
 `;
 
+function topPosts(a, b) {
+    if (a[0] === b[0]) {
+        return 0;
+    }
+    else {
+        return (a[0] < b[0]) ? -1 : 1;
+    }
+}
 
+function truncate(input, length) {
+   if (input.length > length)
+      return input.substring(0,length) + '...';
+   else
+      return input;
+};
 
 function onTimesUp() {
   	clearInterval(timerInterval);

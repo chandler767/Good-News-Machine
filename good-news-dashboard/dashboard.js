@@ -111,7 +111,7 @@ function refreshPosts() {
 	pubnub.history(
 	    {
 	        channel: 'top_voted',
-	        count: 10, // how many items to fetch
+	        count: 20, // how many items to fetch
 	    },
 	    function (status, response) {
 	    	let displayed = 0;
@@ -123,7 +123,7 @@ function refreshPosts() {
 					let post_org = true;
 					for (var u = 0; u < response.messages.length; u++) {
 						if (i != u) {
-							if ((response.messages[i].entry.vote_id == response.messages[u].entry.post.vote_id) || (response.messages[i].entry.post.title.substring(0,100) == response.messages[u].entry.post.title.substring(0,100))) {
+							if ((response.messages[i].entry.vote_id == response.messages[u].entry.vote_id) || (response.messages[i].entry.post.link == response.messages[u].entry.post.link)) {
 								post_org = false;
 							}
 						}

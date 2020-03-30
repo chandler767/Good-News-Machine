@@ -63,6 +63,8 @@
     outline-style: solid;
     outline-offset: -10px;
     padding: 5px 10px 5px 10px;
+    max-height: 250px;
+    overflow: scroll;
 }
 
 .top-story > h2 {
@@ -83,6 +85,11 @@
 .top-story > h2 > a {
     color: #000000;
     text-decoration: none;
+}
+
+#featured-story {
+    max-height: 600px;
+    overflow: scroll;
 }
 
 

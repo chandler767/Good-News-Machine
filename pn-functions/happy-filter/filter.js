@@ -328,6 +328,7 @@ export default (request) => {
         const featuredLast = value.featured_last;
         var avgVote = value.avg_vote;
         var avgVoteAge = value.avg_vote_age;
+        console.log(currentTime - postBuffer);
         if ((currentTime - postBuffer) > cycleDuration) {
             const payload = request.message;
             return vault.get('AWS_access_key').then((AWS_access_key) => {
@@ -361,7 +362,7 @@ export default (request) => {
                            // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
                             const staged_vote_id = generateHash(payload.title.toString()).toString(); 
                             const new_featured  = {
-                                "published": currentTime, //let the frontend know when to cycle posts.
+                                "published": postBuffer+cycleDuration, //let the frontend know when to cycle posts.
                                 "cycle": cycleDuration,
                                 "featured": stagedPost,
                                 "featured_vote_id": stagedPostVoteID,
@@ -371,7 +372,7 @@ export default (request) => {
                             
                             pubnub.publish({ message: new_featured, channel: "news_stream_featured" }); // Publish to featured feed
                             kvstore.set('post_queue', {
-                                post_buffer: currentTime+cycleDuration, // How often to stage a new post to be featured.
+                                post_buffer: postBuffer+cycleDuration, // How often to stage a new post to be featured.
                                 featured_vote_id: stagedPostVoteID,
                                 featured_last: stagedPost,
                                 avg_vote: avgVote,
@@ -410,6 +411,10 @@ export default (request) => {
                                                 avgVote = ((avgVote + featuredVotes)/2);
                                             }
                                         }
+                                        kvstore.set('post_queue', {
+                                            avg_vote: avgVote,
+                                            avg_vote_age: avgVoteAge,
+                                        });
                                         return request.ok();
                                     }).catch((error) => {
                                         console.log(error)

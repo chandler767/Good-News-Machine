@@ -95,7 +95,7 @@ function refreshPosts() {
 	pubnub.history(
 	    {
 	        channel: 'news_stream_featured',
-	        reverse: true,
+	        reverse: false,
 	        count: 1, // how many items to fetch
 	    },
 	    function (status, response) {

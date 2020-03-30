@@ -25,7 +25,7 @@ let timeLeft = timeLimit;
 let timerInterval = null;
 let remainingPathColor = COLOR_CODES.info.color;
 let shownStaged = false;
-let shownEmoji = true;
+let shownEmoji = 0;
 
 var pubnub = new PubNub({
 	publishKey: "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149",
@@ -36,10 +36,10 @@ pubnub.addListener({
 	message: function(message) {
 		currentVoteCount = parseInt(currentVoteCount, 10)+1;
 		document.getElementById('featured-votes').innerHTML = "<p>⭐ "+currentVoteCount+" Votes</p>";
-		if (shownEmoji) {
+		if (shownEmoji == 0) {
 			emojiAnimate(message.message);
 		} else {
-			shownEmoji = true;
+			shownEmoji = shownEmoji-1;
 		}
 	},
 })
@@ -84,7 +84,7 @@ function publishVote(emoji) { // Publish vote
 	let request = new XMLHttpRequest();
     request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/vote?voteid='+currentVoteID+'&emoji='+emoji);
     request.send();
-    shownEmoji = false;
+    shownEmoji = shownEmoji+1;
     emojiAnimate(emoji);   
 };
 

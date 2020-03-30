@@ -361,7 +361,7 @@ export default (request) => {
                            // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
                             const staged_vote_id = generateHash(payload.title.toString()).toString(); 
                             const new_featured  = {
-                                "published": postBuffer+cycleDuration, //let the frontend know when to cycle posts.
+                                "published": (currentTime - (currentTime - postBuffer)), //let the frontend know when to cycle posts.
                                 "cycle": cycleDuration,
                                 "featured": stagedPost,
                                 "featured_vote_id": stagedPostVoteID,
@@ -371,7 +371,7 @@ export default (request) => {
                             
                             pubnub.publish({ message: new_featured, channel: "news_stream_featured" }); // Publish to featured feed
                             kvstore.set('post_queue', {
-                                post_buffer: postBuffer+cycleDuration, // How often to stage a new post to be featured.
+                                post_buffer: (currentTime - (currentTime - postBuffer))+cycleDuration, // How often to stage a new post to be featured.
                                 featured_vote_id: stagedPostVoteID,
                                 featured_last: stagedPost,
                                 avg_vote: avgVote,

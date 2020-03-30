@@ -132,7 +132,7 @@ function refreshPosts() {
 					if (typeof activeFeaturedPost.description != "undefined") {
 						description = truncate(activeFeaturedPost.description.replace( /(<([^>]+)>)/ig, ''), 300);
 					}
-					document.getElementById('featured-story').innerHTML = "<h1>"+truncate(activeFeaturedPost.title, 150)+"</h1><h2>"+description+"</h2><h3><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\">"+activeFeaturedPost.link+"</a></h3><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
+					document.getElementById('featured-story').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 150)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
 			    };
 			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
 			    request.send();

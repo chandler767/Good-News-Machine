@@ -26,7 +26,11 @@
     grid-template-areas: 'header header ' 'lsidebar content '  'footer footer ';
 }
 
-#featured-story > h3 > a {
+#featured-story {
+    padding: 10px;
+}
+
+#featured-story > a {
     color: #FFFFFF;
     text-decoration: none;
 }
@@ -65,13 +69,19 @@
 
 .emoji *{
     font-size: 100px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .top-story {
     text-align: center;
     outline-style: solid;
     outline-offset: -10px;
-    padding: 5px 10px 5px 10px;
+    padding: 10px;
     max-height: 400px;
     overflow: scroll;
 }

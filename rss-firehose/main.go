@@ -6,6 +6,7 @@ import (
 	"github.com/mmcdole/gofeed"
 	pubnub "github.com/pubnub/go"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -68,6 +69,11 @@ func main() {
 		"https://www.cbc.ca/cmlink/rss-topstories",
 		"https://www.seattletimes.com/feed/",
 	}
+	badWords := []string{
+		"death",
+		"frightened",
+		"scared",
+	}
 	config := pubnub.NewConfig()
 	config.PublishKey = "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149"
 	config.SubscribeKey = "sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302"
@@ -80,8 +86,20 @@ func main() {
 		if err != nil { // Parse failied
 			time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Send random news every few seconds
 		} else {
-			pn.Publish().Channel(channel).Message(feed.Items[rand.Intn(len(feed.Items))]).Execute()
+			newPost := feed.Items[rand.Intn(len(feed.Items))]
+			if !contains(badWords, strings.ToLower(newPost.Title)) {
+				pn.Publish().Channel(channel).Message(newPost).Execute()
+			}
 			time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Send random news every few seconds
 		}
 	}
+}
+
+func contains(slice []string, item string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+	_, ok := set[item]
+	return ok
 }

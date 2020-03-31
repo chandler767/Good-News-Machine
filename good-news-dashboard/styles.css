@@ -1,3 +1,6 @@
+body {
+    background-color: #EFEFEF;
+}
 
 #left-sidebar {
     background-color: #EFEFEF;
@@ -7,23 +10,36 @@
 #content {
     grid-area: content;
     position: top;
-    font-family: sans-serif;
+    font-family: 'proxima-nova', Fallback, sans-serif;
     background-color: #313131;
     color: #FFFFFF;
     margin-bottom: 0px;
     text-align: center;
     align-items: center;
+    min-width: 400px;
 }
 
 #chat-content {
-    background-color: #EFEFEF;
+    background-color: #bfbfbf;
     padding-bottom: 20px;
+    height: calc(100% - 650px);
+    max-height: 700px;
+    color: #999999;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center; /* <-- Here */
+    justify-content: center; /* optional */
+}
+
+#chat-content > h3 {
+    font-size: 30px;
 }
 
 #wrapper {
     display: grid;
     grid-template-columns: 300px auto;
     grid-template-areas: 'header header ' 'lsidebar content '  'footer footer ';
+    background-color: #EFEFEF;
 }
 
 #featured-story {
@@ -58,18 +74,12 @@
 
 #top-story-header {
     text-align: center;
-    outline-style: solid;
-    outline-offset: -10px;
 }
 
 #top-story-header > h1 {
     font-size: 24px;
-    padding: 20px 20px 20px 20px
-}
-
-#top-story-header > p {
-    font-size: 14px;
-    padding: 10px 10px 10px 10px
+    padding: 20px 20px 0px 20px;
+    color: #313131;
 }
 
 .emoji *{
@@ -84,35 +94,39 @@
 
 .top-story {
     text-align: center;
-    outline-style: solid;
-    outline-offset: -10px;
+    border-radius: 25px;
+    background-color: #bfbfbf;
     padding: 10px;
-    max-height: 400px;
+    margin: 0px 10px 10px 10px;
+    max-height: 300px;
     overflow: scroll;
 }
 
 .top-story > h2 {
     padding: 0px 0px 0px 0px;
     font-size: 18px;
+    color: #313131;
 }
 
 .top-story > h3 {
     padding: 0px 0px 0px 0px;
     font-size: 12px;
+    color: #313131;
 }
 
 .top-story > p {
     padding: 0px 0px 0px 0px;
     font-size: 14px;
+    color: #313131;
 }
 
 .top-story > h2 > a {
-    color: #000000;
     text-decoration: none;
+    color: #313131;
 }
 
 #featured-story {
-    max-height: 600px;
+    height: 350px;
     overflow: scroll;
 }
 

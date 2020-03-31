@@ -73,6 +73,7 @@ func main() {
 		"death",
 		"frightened",
 		"scared",
+		"smear",
 	}
 	config := pubnub.NewConfig()
 	config.PublishKey = "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149"

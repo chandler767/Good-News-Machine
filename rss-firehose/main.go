@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/mmcdole/gofeed"
 	pubnub "github.com/pubnub/go"
 	"math/rand"
@@ -45,7 +46,6 @@ func main() {
 		"http://feeds.skynews.com/feeds/rss/entertainment.xml",
 		"http://feeds.skynews.com/feeds/rss/us.xml",
 		"https://asianews.network/feed/",
-		"https://www.theverge.com/rss/longform/index.xml",
 		"https://www.theverge.com/rss/exclusive/index.xml",
 		"https://www.theverge.com/rss/breaking/index.xml",
 		"https://www.theverge.com/policy/rss/index.xml",
@@ -67,7 +67,6 @@ func main() {
 		"https://www.cbc.ca/cmlink/rss-arts",
 		"https://www.cbc.ca/cmlink/rss-technology",
 		"https://www.cbc.ca/cmlink/rss-topstories",
-		"https://www.seattletimes.com/feed/",
 	}
 	badWords := []string{
 		"death",
@@ -81,7 +80,7 @@ func main() {
 		"positive for coronavirus;",
 		"dies of coronavirus",
 		"dies after contracting",
-		"contracting COVID-19",
+		"contracting covid-19",
 		"positive for",
 		"dies",
 		"hate",
@@ -96,15 +95,21 @@ func main() {
 	for {
 		rand.Seed(time.Now().Unix())
 		fp := gofeed.NewParser()
-		feed, err := fp.ParseURL(stream_urls[rand.Intn(len(stream_urls))])
+		newFeed := stream_urls[rand.Intn(len(stream_urls))]
+		feed, err := fp.ParseURL(newFeed)
 		if err != nil { // Parse failied
+			fmt.Println("bad url:" + newFeed)
 			time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Send random news every few seconds
 		} else {
-			newPost := feed.Items[rand.Intn(len(feed.Items))]
-			if !contains(badWords, strings.ToLower(newPost.Title)) {
-				pn.Publish().Channel(channel).Message(newPost).Execute()
+			fmt.Println("url:" + newFeed)
+			if len(feed.Items) > 0 {
+				newPost := feed.Items[rand.Intn(len(feed.Items))]
+				//fmt.Println(newPost.Title)
+				if !contains(badWords, strings.ToLower(newPost.Title)) {
+					pn.Publish().Channel(channel).Message(newPost).Execute()
+				}
+				time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Send random news every few seconds
 			}
-			time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Send random news every few seconds
 		}
 	}
 }

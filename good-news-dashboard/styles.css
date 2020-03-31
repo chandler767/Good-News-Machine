@@ -33,6 +33,7 @@ body {
 
 #chat-content > h3 {
     font-size: 30px;
+    font-family: 'proxima-nova', Fallback, sans-serif;
 }
 
 #wrapper {
@@ -78,6 +79,7 @@ body {
 
 #top-story-header > h1 {
     font-size: 24px;
+    font-family: 'proxima-nova', Fallback, sans-serif;
     padding: 20px 20px 0px 20px;
     color: #313131;
 }
@@ -103,18 +105,21 @@ body {
 .top-story > h2 {
     padding: 0px 0px 0px 0px;
     font-size: 18px;
+    font-family: 'proxima-nova', Fallback, sans-serif;
     color: #313131;
 }
 
 .top-story > h3 {
     padding: 0px 0px 0px 0px;
     font-size: 12px;
+    font-family: 'proxima-nova', Fallback, sans-serif;
     color: #313131;
 }
 
 .top-story > p {
     padding: 0px 0px 0px 0px;
     font-size: 14px;
+    font-family: 'proxima-nova', Fallback, sans-serif;
     color: #313131;
 }
 
@@ -180,4 +185,5 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 25px;
+    font-family: 'proxima-nova', Fallback, sans-serif;
 }

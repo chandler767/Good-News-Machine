@@ -97,10 +97,10 @@ func main() {
 }
 
 func contains(slice []string, item string) bool {
-	set := make(map[string]struct{}, len(slice))
-	for _, s := range slice {
-		set[s] = struct{}{}
+	for i := 0; i < len(slice); i++ {
+		if strings.Contains(item, slice[i]) {
+			return true
+		}
 	}
-	_, ok := set[item]
-	return ok
+	return false
 }

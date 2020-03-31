@@ -61,23 +61,29 @@ function emojiAnimate(emoji){
 	}
 	div.style.position = "absolute";
 	div.style.bottom = "-100%"; 
-	div.style.left = Math.floor(Math.random() * width)+"px";
+	div.style.left = Math.floor((Math.random() * (width-20)) + 10)+"px";
+	div.style.opacity = 0;
 	document.getElementById('wrapper').append(div);
 	animateUp(div)
 }
 
 function animateUp(elem) {
-  var pos =-125;
-  var id = setInterval(frame, 10);
-  function frame() {
-    if (pos == 125) {
-      clearInterval(id);
-      elem.parentElement.removeChild(elem);
-    } else {
-      pos++;
-      elem.style.bottom = pos + '%';
-    }
-  }
+	var pos = 0;
+	var opac = 0;
+	var id = setInterval(frame, 7);
+	function frame() {
+		if (pos == 125) {
+			clearInterval(id);
+			elem.parentElement.removeChild(elem);
+		} else {
+			pos++;
+			if (opac < 1) {
+				opac = opac+0.05;
+				elem.style.opacity = opac;
+			}
+			elem.style.bottom = pos + '%';
+		}
+	}
 }
 
 function publishVote(emoji) { // Publish vote

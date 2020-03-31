@@ -1,6 +1,15 @@
-const FULL_DASH_ARRAY = 283;
-const WARNING_THRESHOLD = 30;
-const ALERT_THRESHOLD = 10;
+let currentVoteID;
+let currentVoteCount;
+
+let timeLimit = 300;
+let timePassed = 0;
+let timeLeft = timeLimit;
+let timerInterval = null;
+let shownEmoji = 0;
+
+const FULL_DASH_ARRAY = timeLimit;
+const WARNING_THRESHOLD = timeLimit/3;
+const ALERT_THRESHOLD = timeLimit/6;
 
 const COLOR_CODES = {
   info: {
@@ -15,17 +24,8 @@ const COLOR_CODES = {
     threshold: ALERT_THRESHOLD
   }
 };
-
-let currentVoteID;
-let currentVoteCount;
-
-let timeLimit = 300;
-let timePassed = 0;
-let timeLeft = timeLimit;
-let timerInterval = null;
 let remainingPathColor = COLOR_CODES.info.color;
-let shownStaged = false;
-let shownEmoji = 0;
+
 
 var pubnub = new PubNub({
 	publishKey: "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149",
@@ -107,17 +107,17 @@ function refreshPosts() {
 	    		let activeFeaturedPost = response.messages[0].entry.featured;
 	    		currentVoteID = response.messages[0].entry.featured_vote_id;
 	    		timePassed = (Math.round((new Date()).getTime() / 1000) - response.messages[0].entry.published);
-	    		if (timePassed >= timeLimit) { // Rotate to posts if a new post is not yet ready. 
-	    			if (shownStaged == false) {
-	    				activeFeaturedPost = response.messages[0].entry.staged;
-	    				currentVoteID = response.messages[0].entry.staged_post_vote_id;
-	    				shownStaged = true;
-	    			} else {
-	    				shownStaged = false;
-	    			}
-	    			timePassed = 0;
+	    		let timePassedLoops = Math.round(timePassed / timeLimit);
+	    		timePassed = timePassed - (timePassedLoops*timeLimit);
+	    		if (timePassed < 0) {
+	    			timePassed = timePassed+timeLimit;
+	    			timePassedLoops = timePassedLoops-1;
 	    		}
-
+				console.log(timePassed);
+	    		if (timePassedLoops % 2 == 0) { // Rotate to posts if a new post is not yet ready. 
+	    			activeFeaturedPost = response.messages[0].entry.staged;
+	    			currentVoteID = response.messages[0].entry.staged_post_vote_id;
+	    		} 
 	    		let request = new XMLHttpRequest();
 			    request.onreadystatechange = function() {
 			        if (this.readyState == 4 && this.status == 200) {
@@ -149,7 +149,7 @@ function refreshPosts() {
 	    {
 	        channel: 'top_voted',
 	        reverse: false,
-	        count: 20, // how many items to fetch
+	        count: 15, // how many items to fetch
 	    },
 	    function (status, response) {
 	    	let displayed = 0;
@@ -160,7 +160,7 @@ function refreshPosts() {
 					let post_org = true;
 					for (var u = 0; u < topPostMessages.length; u++) {
 						if (i != u) {
-							if ((topPostMessages[i].entry.vote_id == topPostMessages[u].entry.vote_id) || (topPostMessages[i].entry.post.link == topPostMessages[u].entry.post.link)) {
+							if (topPostMessages[i].entry.post.link == topPostMessages[u].entry.post.link) {
 								post_org = false;
 							}
 						}
@@ -176,11 +176,15 @@ function refreshPosts() {
 								}
 								let title = truncate(currentPost.post.title, 100);
 								let link = currentPost.post.link;
+								let votes = currentPost.votes;
 								let request = new XMLHttpRequest();
 							    request.onreadystatechange = function() {
 							    	let postVoteCount = 0;
 							        if (this.readyState == 4 && this.status == 200) {
 							            postVoteCount = this.responseText;
+							            if (postVoteCount < votes) { // The object may have been removed from history. 
+							            	postVoteCount = votes;
+							            }
 							            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+link+"\" target=\"_blank\">🔗"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
 							        	addToTop(posts.sort(function(a,b) {
 											return a[0]-b[0]
@@ -189,7 +193,6 @@ function refreshPosts() {
 							    };
 							    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentPost.vote_id);
 							    request.send();
-
 							}
 						}
 					}

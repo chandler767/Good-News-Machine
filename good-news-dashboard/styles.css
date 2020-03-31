@@ -16,13 +16,13 @@ body {
     margin-bottom: 0px;
     text-align: center;
     align-items: center;
-    min-width: 400px;
+    min-width: 450px;
 }
 
 #chat-content {
     background-color: #bfbfbf;
     padding-bottom: 20px;
-    height: calc(100% - 650px);
+    height: calc(100% - 600px);
     max-height: 700px;
     color: #999999;
     display: -webkit-flex;
@@ -98,8 +98,6 @@ body {
     background-color: #bfbfbf;
     padding: 10px;
     margin: 0px 10px 10px 10px;
-    max-height: 300px;
-    overflow: scroll;
 }
 
 .top-story > h2 {
@@ -126,8 +124,8 @@ body {
 }
 
 #featured-story {
-    height: 350px;
-    overflow: scroll;
+    min-height: 300px;
+    max-height: 500px;
 }
 
 .base-timer {
@@ -184,4 +182,3 @@ body {
     justify-content: center;
     font-size: 25px;
 }
-

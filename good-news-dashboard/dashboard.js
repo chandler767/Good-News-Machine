@@ -129,7 +129,7 @@ function refreshPosts() {
 					});
 					let description = "";
 					if (typeof activeFeaturedPost.description != "undefined") {
-						description = truncate(activeFeaturedPost.description.replace( /(<([^>]+)>)/ig, ''), 300);
+						description = truncate(activeFeaturedPost.description.replace( /(<([^>]+)>)/ig, ''), 150);
 					}
 					document.getElementById('featured-story').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 98)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
 			    };
@@ -171,7 +171,7 @@ function refreshPosts() {
 								displayed = displayed+1;
 								let description = "";
 								if (currentPost.post.description !== undefined) {
-									description = truncate(currentPost.post.description.replace( /(<([^>]+)>)/ig, ''), 200);
+									description = truncate(currentPost.post.description.replace( /(<([^>]+)>)/ig, ''), 150);
 								}
 								let title = truncate(currentPost.post.title, 98);
 								let link = currentPost.post.link;

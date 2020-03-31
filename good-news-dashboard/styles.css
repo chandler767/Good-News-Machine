@@ -124,8 +124,7 @@ body {
 }
 
 #featured-story {
-    min-height: 300px;
-    max-height: 500px;
+    min-height: 300px;    
 }
 
 .base-timer {

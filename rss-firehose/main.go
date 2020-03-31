@@ -79,6 +79,7 @@ func main() {
 		"testing positive",
 		"positive for coronavirus",
 		"positive for coronavirus;",
+		"dies of coronavirus",
 		"positive for",
 		"hate",
 		"fear",

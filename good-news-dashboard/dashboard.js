@@ -1,7 +1,7 @@
 let currentVoteID;
 let currentVoteCount;
 
-let timeLimit = 300;
+let timeLimit = 180;
 let timePassed = 0;
 let timeLeft = timeLimit;
 let timerInterval = null;
@@ -113,7 +113,6 @@ function refreshPosts() {
 	    			timePassed = timePassed+timeLimit;
 	    			timePassedLoops = timePassedLoops-1;
 	    		}
-				console.log(timePassed);
 	    		if (timePassedLoops % 2 == 0) { // Rotate to posts if a new post is not yet ready. 
 	    			activeFeaturedPost = response.messages[0].entry.staged;
 	    			currentVoteID = response.messages[0].entry.staged_post_vote_id;
@@ -132,7 +131,7 @@ function refreshPosts() {
 					if (typeof activeFeaturedPost.description != "undefined") {
 						description = truncate(activeFeaturedPost.description.replace( /(<([^>]+)>)/ig, ''), 300);
 					}
-					document.getElementById('featured-story').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 150)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
+					document.getElementById('featured-story').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 98)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
 			    };
 			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
 			    request.send();
@@ -174,7 +173,7 @@ function refreshPosts() {
 								if (currentPost.post.description !== undefined) {
 									description = truncate(currentPost.post.description.replace( /(<([^>]+)>)/ig, ''), 200);
 								}
-								let title = truncate(currentPost.post.title, 100);
+								let title = truncate(currentPost.post.title, 98);
 								let link = currentPost.post.link;
 								let votes = currentPost.votes;
 								let request = new XMLHttpRequest();

@@ -74,6 +74,15 @@ func main() {
 		"frightened",
 		"scared",
 		"smear",
+		"test positive",
+		"tests positive",
+		"testing positive",
+		"positive for coronavirus",
+		"positive for coronavirus;",
+		"positive for",
+		"hate",
+		"fear",
+		"scared",
 	}
 	config := pubnub.NewConfig()
 	config.PublishKey = "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149"

@@ -98,6 +98,7 @@ func main() {
 		"shot",
 		"killed",
 		"murdered",
+		"invincible until",
 	}
 
 	config := pubnub.NewConfig()

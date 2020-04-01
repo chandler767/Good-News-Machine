@@ -395,41 +395,27 @@ export default (request) => {
                             if (featuredVoteID != "undefined" ) {
                                 return kvstore.get(featuredVoteID).then((value) => {
                                     const featuredVotes = value.votes;
-                                    pubnub.history({
-                                        channel: 'top_voted',
-                                        count: 5 // how many items to fetch
-                                    }).then((response) => {
-                                        const new_top  = {
-                                            "votes": featuredVotes,
-                                            "vote_id": featuredVoteID,
-                                            "post": featuredLast,
-                                        };
-                                        if (response.messages == "undefined" || response.messages.length < 5) {
-                                            pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
-                                            avgVote = ((avgVote + featuredVotes)/2);
-                                        } else {
-                                            if (featuredVotes > avgVote) { // Published to top_voted channel
-                                                pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
-                                                avgVote = ((avgVote + featuredVotes)/2);
-                                            }
-                                        }
-                                        kvstore.set('post_queue', {
-                                            post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
-                                            featured_vote_id: stagedPostVoteID,
-                                            featured_last: stagedPost,
-                                            avg_vote: avgVote,
-                                            avg_vote_age: avgVoteAge,
-                                            staged_post: payload,
-                                            staged_post_vote_id: staged_vote_id
-                                        });
-                                        return request.ok();
-                                    }).catch((error) => {
-                                        console.log(error)
-                                        return request.ok();
+                                    const new_top  = {
+                                        "votes": featuredVotes,
+                                        "vote_id": featuredVoteID,
+                                        "post": featuredLast,
+                                    };
+                                    if ((featuredVotes > avgVote) && (featuredVotes > 1)) { // Published to top_voted channel
+                                        pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
+                                        avgVote = ((avgVote + featuredVotes)/2);
+                                    }
+                                    kvstore.set('post_queue', {
+                                        post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
+                                        featured_vote_id: stagedPostVoteID,
+                                        featured_last: stagedPost,
+                                        avg_vote: avgVote,
+                                        avg_vote_age: avgVoteAge,
+                                        staged_post: payload,
+                                        staged_post_vote_id: staged_vote_id
                                     });
                                     return request.ok();
-                                }).catch(function (error) {
-                                    console.log(error);
+                                }).catch((error) => {
+                                    console.log(error)
                                     return request.ok();
                                 });
                             }

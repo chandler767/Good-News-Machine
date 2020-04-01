@@ -12,7 +12,8 @@ import (
 )
 
 func main() {
-	stream_urls := []string{
+
+	stream_urls := []string{ // List of RSS feeds to randomly parse and send posts.
 		"http://feeds.bbci.co.uk/news/world/rss.xml",
 		"http://feeds.bbci.co.uk/news/rss.xml",
 		"http://feeds.reuters.com/reuters/topNews?format=xml",
@@ -68,7 +69,8 @@ func main() {
 		"https://www.cbc.ca/cmlink/rss-technology",
 		"https://www.cbc.ca/cmlink/rss-topstories",
 	}
-	badWords := []string{
+
+	badWords := []string{ // Prefilter. Ban these words from titles completely (even if the context would be positive).
 		"death",
 		"frightened",
 		"scared",
@@ -86,35 +88,49 @@ func main() {
 		"hate",
 		"fear",
 		"scared",
+		"victim",
+		"sacrifices herself",
+		"sacrifices himself",
+		"fatal",
+		"bad news",
+		"sad",
+		"gun",
+		"shot",
+		"killed",
+		"murdered",
 	}
+
 	config := pubnub.NewConfig()
-	config.PublishKey = "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149"
-	config.SubscribeKey = "sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302"
+	config.PublishKey = "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149"   // Your PubNub PUBLISH key here.
+	config.SubscribeKey = "sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302" // Your PubNub SUBSCRIBE key here.
 	channel := "news_stream"
+	var lastTitle string
 	pn := pubnub.NewPubNub(config)
 	for {
-		rand.Seed(time.Now().Unix())
+		rand.Seed(time.Now().UnixNano() / int64(time.Millisecond))
 		fp := gofeed.NewParser()
-		newFeed := stream_urls[rand.Intn(len(stream_urls))]
+		newFeed := stream_urls[rand.Intn(len(stream_urls))] // Pick random RSS feed.
 		feed, err := fp.ParseURL(newFeed)
 		if err != nil { // Parse failied
-			//fmt.Println("bad url:" + newFeed)
-			time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Send random news every few seconds
+			//fmt.Println("bad url:" + newFeed) // Delete these from the array if you see them.
 		} else {
 			//fmt.Println("url:" + newFeed)
 			if len(feed.Items) > 0 {
-				newPost := feed.Items[rand.Intn(len(feed.Items))]
+				newPost := feed.Items[rand.Intn(len(feed.Items))] // Pick random post from RSS feed.
 				//fmt.Println(newPost.Title)
-				if !contains(badWords, strings.ToLower(newPost.Title)) {
-					pn.Publish().Channel(channel).Message(newPost).Execute()
+				if !strings.Contains(newPost.Title, lastTitle) { // Avoid duplicate sends.
+					if !contains(badWords, strings.ToLower(newPost.Title)) {
+						lastTitle = newPost.Title
+						pn.Publish().Channel(channel).Message(newPost).Execute() // Send random posts.
+					}
 				}
-				time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Send random news every few seconds
 			}
 		}
+		time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Random delay to slow things down.
 	}
 }
 
-func contains(slice []string, item string) bool {
+func contains(slice []string, item string) bool { // Prefilter.
 	for i := 0; i < len(slice); i++ {
 		if strings.Contains(item, slice[i]) {
 			return true

@@ -190,7 +190,7 @@ function refreshPosts() {
 							            if (postVoteCount < votes) { // The object may have been removed from history. 
 							            	postVoteCount = votes;
 							            }
-							            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+link+"\" target=\"_blank\">🔗"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
+							            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+link+"\" target=\"_blank\">"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
 							        	addToTop(posts.sort(function(a,b) {
 											return a[0]-b[0]
 										}));

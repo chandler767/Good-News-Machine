@@ -118,7 +118,7 @@ func main() {
 			if len(feed.Items) > 0 {
 				newPost := feed.Items[rand.Intn(len(feed.Items))] // Pick random post from RSS feed.
 				//fmt.Println(newPost.Title)
-				if !strings.Contains(newPost.Title, lastTitle) { // Avoid duplicate sends.
+				if newPost.Title != lastTitle { // Avoid duplicate sends.
 					if !contains(badWords, strings.ToLower(newPost.Title)) {
 						lastTitle = newPost.Title
 						pn.Publish().Channel(channel).Message(newPost).Execute() // Send random posts.

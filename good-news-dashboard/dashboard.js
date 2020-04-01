@@ -161,12 +161,14 @@ function refreshPosts() {
 	    	var topPostMessages = response.messages;
 	    	if (typeof topPostMessages !== "undefined" && topPostMessages.length > 0) {
 	    		let posts = [];
-				for (var i = 0; i < topPostMessages.length; i++) {
+				for (var i = topPostMessages.length-1; i >= 0; i--) {
+					console.log(topPostMessages[i].entry.post.link);
 					let post_org = true;
-					for (var u = 0; u < topPostMessages.length; u++) {
+					for (var u = topPostMessages.length-1; u >= 0; u--) {
 						if (i != u) {
 							if (topPostMessages[i].entry.post.link == topPostMessages[u].entry.post.link) {
 								post_org = false;
+								console.log("false");
 							}
 						}
 					};

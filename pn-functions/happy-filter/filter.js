@@ -385,6 +385,20 @@ export default (request) => {
                                 avgVote = 0;
                             }
 
+                            kvstore.set(staged_vote_id, {
+                                votes: 1
+                            });
+
+                            kvstore.set('post_queue', {
+                                post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
+                                featured_vote_id: stagedPostVoteID,
+                                featured_last: stagedPost,
+                                avg_vote: avgVote,
+                                avg_vote_age: avgVoteAge,
+                                staged_post: payload,
+                                staged_post_vote_id: staged_vote_id
+                            });
+
                             if (featuredVoteID != "undefined" ) { // Check if top voted post.
                                 return kvstore.get(featuredVoteID).then((value) => {
                                     const featuredVotes = value.votes;
@@ -397,25 +411,21 @@ export default (request) => {
                                         pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
                                         avgVote = ((avgVote + featuredVotes)/2);
                                     }
+                                    kvstore.set('post_queue', {
+                                        post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
+                                        featured_vote_id: stagedPostVoteID,
+                                        featured_last: stagedPost,
+                                        avg_vote: avgVote,
+                                        avg_vote_age: avgVoteAge,
+                                        staged_post: payload,
+                                        staged_post_vote_id: staged_vote_id
+                                    });
+                                    return request.ok();
                                 }).catch((error) => {
                                     console.log(error)
                                     return request.ok();
                                 });
                             }
-
-                            kvstore.set('post_queue', {
-                                post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
-                                featured_vote_id: stagedPostVoteID,
-                                featured_last: stagedPost,
-                                avg_vote: avgVote,
-                                avg_vote_age: avgVoteAge,
-                                staged_post: payload,
-                                staged_post_vote_id: staged_vote_id
-                            });
-
-                            kvstore.set(staged_vote_id, {
-                                votes: 1
-                            });
                             return request.ok();
                         }
                         return request.ok();

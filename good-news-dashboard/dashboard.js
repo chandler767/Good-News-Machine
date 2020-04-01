@@ -61,7 +61,7 @@ function emojiAnimate(emoji){
 	}
 	div.style.position = "absolute";
 	div.style.bottom = "-100%"; 
-	div.style.left = Math.floor((Math.random() * (width-20)) + 10)+"px";
+	div.style.left = Math.floor((Math.random() * (width-110)) + 10)+"px";
 	div.style.opacity = 0;
 	document.getElementById('wrapper').append(div);
 	animateUp(div)

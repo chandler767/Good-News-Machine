@@ -316,7 +316,7 @@ export default (request) => {
         return new RequestSigner(request, credentials).sign()
     }
 
-    console.log(request);
+    console.log(request.message);
     
     const cycleDuration = 180; // How often to change the featured post
     const resetVoteAvg = 86400; // How often to reset the vote average

@@ -13,10 +13,10 @@ const ALERT_THRESHOLD = timeLimit/5;
 
 const COLOR_CODES = {
   info: {
-    color: "green"
+    color: "#F79041"
   },
   warning: {
-    color: "orange",
+    color: "#FF4900",
     threshold: WARNING_THRESHOLD
   },
   alert: {
@@ -107,7 +107,7 @@ function refreshPosts() {
 	    function (status, response) {
 	    	if (response.messages != "undefined" && response.messages.length > 0) {
 	    		console.log(response);
-	    		document.getElementById('featured-story').innerHTML = "";
+	    		document.getElementById('featured-story-post').innerHTML = "";
 	    		timeLimit = response.messages[0].entry.cycle;
 	    		timeLeft = timeLimit;
 	    		let activeFeaturedPost = response.messages[0].entry.featured;
@@ -137,14 +137,14 @@ function refreshPosts() {
 					if (typeof activeFeaturedPost.description != "undefined") {
 						description = truncate(activeFeaturedPost.description.replace( /(<([^>]+)>)/ig, ''), 150);
 					}
-					document.getElementById('featured-story').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 98)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
+					document.getElementById('featured-story-post').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 98)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
 			    };
 			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
 			    request.send();
 
 			    startTimer();
 			} else {
-				document.getElementById('featured-story').innerHTML = "<h1>Unable to get featured post ):</h1>";
+				document.getElementById('featured-story-post').innerHTML = "<h1>Unable to get featured post ):</h1>";
 			}
 	  	}
 	);
@@ -224,7 +224,8 @@ document.getElementById("countdown").innerHTML = `
       <path
         id="base-timer-path-remaining"
         stroke-dasharray="283"
-        class="base-timer__path-remaining ${remainingPathColor}"
+        class="base-timer__path-remaining"
+        style="color:${remainingPathColor}"
         d="
           M 50, 50
           m -45, 0
@@ -234,9 +235,6 @@ document.getElementById("countdown").innerHTML = `
       ></path>
     </g>
   </svg>
-  <span id="base-timer-label" class="base-timer__label">${formatTime(
-    timeLeft
-  )}</span>
 </div>
 `;
 
@@ -265,7 +263,7 @@ function startTimer() {
   timerInterval = setInterval(() => {
     timePassed = timePassed += 1;
     timeLeft = timeLimit - timePassed;
-    document.getElementById("base-timer-label").innerHTML = formatTime(
+    document.getElementById("countdown-time").innerHTML = "More good news in: " + formatTime(
       timeLeft
     );
     setCircleDasharray();
@@ -293,27 +291,15 @@ function setRemainingPathColor(timeLeft) {
 	if (timeLeft <= alert.threshold) {
 		document
 			.getElementById("base-timer-path-remaining")
-			.classList.remove(warning.color);
-		document
-			.getElementById("base-timer-path-remaining")
-			.classList.add(alert.color);
+			.style.color = alert.color;
 	} else if (timeLeft <= warning.threshold) {
 		document
 			.getElementById("base-timer-path-remaining")
-			.classList.remove(info.color);
-		document
-			.getElementById("base-timer-path-remaining")
-			.classList.add(warning.color);
+			.style.color = warning.color;
 	} else {
 		document
 			.getElementById("base-timer-path-remaining")
-			.classList.remove(alert.color);
-		document
-			.getElementById("base-timer-path-remaining")
-			.classList.remove(warning.color);
-		document
-			.getElementById("base-timer-path-remaining")
-			.classList.add(info.color);
+			.style.color = info.color;
 	}
 }
 

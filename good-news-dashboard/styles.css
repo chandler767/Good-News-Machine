@@ -10,9 +10,8 @@ body {
 #content {
     grid-area: content;
     position: top;
-    font-family: 'proxima-nova', Fallback, sans-serif;
-    background-color: #313131;
-    color: #FFFFFF;
+    font-family: "proxima-nova",sans-serif;
+    background-color: #F9FAFC 0% 0% no-repeat padding-box;
     margin-bottom: 0px;
     text-align: center;
     align-items: center;
@@ -20,11 +19,10 @@ body {
 }
 
 #chat-content {
-    background-color: #bfbfbf;
     padding-bottom: 20px;
-    height: calc(100% - 600px);
+    height: calc(50%);
     max-height: 700px;
-    color: #999999;
+    color: #CCCCCC;
     display: -webkit-flex;
     display: flex;
     align-items: center; /* <-- Here */
@@ -33,27 +31,68 @@ body {
 
 #chat-content > h3 {
     font-size: 30px;
-    font-family: 'proxima-nova', Fallback, sans-serif;
+    font-family: "proxima-nova",sans-serif;
 }
 
 #wrapper {
     display: grid;
     grid-template-columns: 300px auto;
     grid-template-areas: 'header header ' 'lsidebar content '  'footer footer ';
-    background-color: #EFEFEF;
+    background-color: #F9FAFC 0% 0% no-repeat padding-box;
 }
 
 #featured-story {
     padding: 10px;
+    margin: 10px;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 6px #00000029;
+    border-radius: 0px 0px 10px 10px;
+    border-top: 8px solid #F79041;
+    letter-spacing: 0px;
 }
 
-#featured-story > a {
-    color: #FFFFFF;
+#countdown-time {
+    font-size: 17px;
+    font-family: "proxima-nova",sans-serif;
+    letter-spacing: 0px;
+    color: #ED4286;
+}
+
+#featured-story-post > a > h1 {
+    color: #ED4286;
+}
+
+#featured-story-post > h2 {
+    color: #BF4F9F;
+}
+
+#featured-story-post > a > h2 {
+    color: #46C4F4;
+}
+
+#featured-story-post > a {
     text-decoration: none;
 }
 
+#featured-votes > p {
+    letter-spacing: 0px;
+    color: #F79041;
+    font-weight: bold;
+    padding: 10px;
+    font-size: 24px;
+}
+
 #featured-vote {
-    background-color: #DCDCDC;
+    background: transparent linear-gradient(101deg, #FEBA2C 0%, #F79041 100%) 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 6px #00000029;
+    border-radius: 10px;
+    position: absolute; 
+    left: 300;
+    right: 0;
+    margin-top: -12px;
+    margin-left: auto; 
+    margin-right: auto; 
+    width: 348px;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -63,8 +102,8 @@ body {
 }
 
 #featured-vote > button {
+    background-color: Transparent;
     font-size: 50px;
-    background-color: #DCDCDC;
     padding: -15px;
     border-width: 0px;
 }
@@ -79,8 +118,8 @@ body {
 
 #top-story-header > h1 {
     font-size: 24px;
-    font-family: 'proxima-nova', Fallback, sans-serif;
-    padding: 20px 20px 0px 20px;
+    font-family: "proxima-nova",sans-serif;
+    padding: 20px;
     color: #313131;
 }
 
@@ -96,31 +135,37 @@ body {
 
 .top-story {
     text-align: center;
-    border-radius: 25px;
-    background-color: #bfbfbf;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 6px #00000029;
+    border-radius: 0px 0px 10px 10px;
     padding: 10px;
-    margin: 0px 10px 10px 10px;
+    margin: 20px;
+    border-top: 6px solid #F79041;
 }
 
 .top-story > h2 {
     padding: 0px 0px 0px 0px;
-    font-size: 18px;
-    font-family: 'proxima-nova', Fallback, sans-serif;
-    color: #313131;
+    font-size: 17px;
+    font-family: "proxima-nova",sans-serif;
+    letter-spacing: 0px;
+    color: #2F394D;
+    font-weight: bold;
 }
 
 .top-story > h3 {
     padding: 0px 0px 0px 0px;
-    font-size: 12px;
-    font-family: 'proxima-nova', Fallback, sans-serif;
-    color: #313131;
+    font-size: 10px;
+    font-family: "proxima-nova",sans-serif;
+    letter-spacing: 0px;
+    color: #2F394D;
 }
 
 .top-story > p {
     padding: 0px 0px 0px 0px;
     font-size: 14px;
-    font-family: 'proxima-nova', Fallback, sans-serif;
+    font-family: "proxima-nova",sans-serif;
     color: #313131;
+    font-weight: bold;
 }
 
 .top-story > h2 > a {
@@ -185,5 +230,5 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 25px;
-    font-family: 'proxima-nova', Fallback, sans-serif;
+    font-family: "proxima-nova",sans-serif;
 }

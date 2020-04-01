@@ -7,9 +7,9 @@ let timeLeft = timeLimit;
 let timerInterval = null;
 let shownEmoji = 0;
 
-const FULL_DASH_ARRAY = timeLimit;
+const FULL_DASH_ARRAY = 283;
 const WARNING_THRESHOLD = timeLimit/3;
-const ALERT_THRESHOLD = timeLimit/6;
+const ALERT_THRESHOLD = timeLimit/5;
 
 const COLOR_CODES = {
   info: {

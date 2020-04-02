@@ -96,12 +96,15 @@ func main() {
 		"sad",
 		"gun",
 		"shot",
-		"killed",
 		"murdered",
 		"invincible until",
 		"fatal case",
 		"fatalities",
 		"fatality",
+		"sour note",
+		"shooter",
+		"kill",
+		"flaw",
 	}
 
 	config := pubnub.NewConfig()

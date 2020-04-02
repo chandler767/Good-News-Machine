@@ -299,18 +299,6 @@ export default (request) => {
             
         return path
     }
-
-    function generateHash(string) {
-        var hash = 0;
-        if (string.length == 0)
-            return hash;
-        for (let i = 0; i < string.length; i++) {
-            var charCode = string.charCodeAt(i);
-            hash = ((hash << 7) - hash) + charCode;
-            hash = hash & hash;
-        }
-        return hash;
-    }
     
     function signAWS(request, credentials) {
         return new RequestSigner(request, credentials).sign()
@@ -364,7 +352,7 @@ export default (request) => {
                         console.log(sentiment);
                         if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish.
                            // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
-                            const staged_vote_id = generateHash(payload.title.toString()).toString(); 
+                            const staged_vote_id = payload.title.toString().substring(0, 25) 
                             const new_featured  = {
                                 "published": (currentTime - (currentTime - postBuffer)), // Publish when to cycle posts.
                                 "cycle": cycleDuration,
@@ -382,7 +370,7 @@ export default (request) => {
 
                             if ((currentTime - avgVoteAge) > resetVoteAvg) { // Reset vote avg.
                                 avgVoteAge = currentTime;
-                                avgVote = 0;
+                                avgVote = avgVote/2; // Reduce by 1/2 every 24 hours so that new posts can be shown in top_posts
                             }
 
                             kvstore.set(staged_vote_id, {

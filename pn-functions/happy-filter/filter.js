@@ -352,7 +352,7 @@ export default (request) => {
                         console.log(sentiment);
                         if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish.
                            // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
-                            const staged_vote_id = payload.title.toString().substring(0, 25) 
+                            const staged_vote_id = hash(payload.link.toString(), "hex"); 
                             const new_featured  = {
                                 "published": (currentTime - (currentTime - postBuffer)), // Publish when to cycle posts.
                                 "cycle": cycleDuration,
@@ -370,7 +370,7 @@ export default (request) => {
 
                             if ((currentTime - avgVoteAge) > resetVoteAvg) { // Reset vote avg.
                                 avgVoteAge = currentTime;
-                                avgVote = avgVote/2; // Reduce by 1/2 every 24 hours so that new posts can be shown in top_posts
+                                avgVote = avgVote/2; // Reduce by 1/2 every 24 hours so that new posts can be shown in top_posts.
                             }
 
                             kvstore.set(staged_vote_id, {

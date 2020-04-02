@@ -108,6 +108,8 @@ func main() {
 		"broken",
 		"damaged",
 		"hurt",
+		"grim",
+		"casualty",
 	}
 
 	config := pubnub.NewConfig()

@@ -106,7 +106,7 @@ function refreshPosts() {
 	    },
 	    function (status, response) {
 	    	if (response.messages != "undefined" && response.messages.length > 0) {
-	    		console.log(response);
+	    		//console.log(response);
 	    		document.getElementById('featured-story-post').innerHTML = "";
 	    		timeLimit = response.messages[0].entry.cycle;
 	    		timeLeft = timeLimit;
@@ -167,13 +167,13 @@ function refreshPosts() {
 	    	if (typeof topPostMessages !== "undefined" && topPostMessages.length > 0) {
 	    		let posts = [];
 				for (var i = topPostMessages.length-1; i >= 0; i--) {
-					console.log(topPostMessages[i].entry.post.link);
+					//console.log(topPostMessages[i].entry.post.link);
 					let post_org = true;
 					for (var u = topPostMessages.length-1; u >= 0; u--) {
 						if (i != u) {
 							if (topPostMessages[i].entry.post.link == topPostMessages[u].entry.post.link) {
 								post_org = false;
-								console.log("false");
+								//console.log("false");
 							}
 						}
 					};

@@ -105,6 +105,9 @@ func main() {
 		"shooter",
 		"kill",
 		"flaw",
+		"broken",
+		"damaged",
+		"hurt",
 	}
 
 	config := pubnub.NewConfig()

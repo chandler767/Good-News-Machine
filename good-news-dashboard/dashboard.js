@@ -262,17 +262,15 @@ function truncate(input, length) {
 };
 
 function animateValue(id, start, end, duration) {
-    // assumes integer values for start and end
-    
-    var obj = document.getElementById(id);
+var obj = document.getElementById(id);
     var range = end - start;
-    // no timer shorter than 50ms (not really visible any way)
     var minTimer = 50;
     var stepTime = Math.abs(Math.floor(duration / range));
     stepTime = Math.max(stepTime, minTimer);
+
     var shownEmojis = 0;
-    var maxEmojis = 10;
-    // get current time and calculate desired end time
+    var maxEmojis = 10; // Limit the amount of animations on screen.
+
     var startTime = new Date().getTime();
     var endTime = startTime + duration;
     var timer;

@@ -137,7 +137,12 @@ function refreshPosts() {
 					if (typeof activeFeaturedPost.description != "undefined") {
 						description = truncate(activeFeaturedPost.description.replace( /(<([^>]+)>)/ig, ''), 150);
 					}
-					document.getElementById('featured-story-post').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 98)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ "+currentVoteCount+" Votes</p></div>";
+					document.getElementById('featured-story-post').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 98)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ 0 Votes</p></div>";
+			    	let minValue = 0
+			    	if (currentVoteCount>10){
+			    		minValue = currentVoteCount-10;
+			    	}
+			    	animateValue("featured-votes", minValue, currentVoteCount, 500);
 			    };
 			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
 			    request.send();
@@ -255,6 +260,43 @@ function truncate(input, length) {
    else
       return input;
 };
+
+function animateValue(id, start, end, duration) {
+    // assumes integer values for start and end
+    
+    var obj = document.getElementById(id);
+    var range = end - start;
+    // no timer shorter than 50ms (not really visible any way)
+    var minTimer = 50;
+    var stepTime = Math.abs(Math.floor(duration / range));
+    stepTime = Math.max(stepTime, minTimer);
+    var shownEmojis = 0;
+    var maxEmojis = 10;
+    // get current time and calculate desired end time
+    var startTime = new Date().getTime();
+    var endTime = startTime + duration;
+    var timer;
+  
+    function run() {
+        var now = new Date().getTime();
+        var remaining = Math.max((endTime - now) / duration, 0);
+        var value = Math.round(end - (remaining * range));
+        obj.innerHTML = "<p>⭐ "+value+" Votes</p>";
+        if (range<maxEmojis) {
+        	maxEmojis = range;
+        }
+        if (shownEmojis<maxEmojis){
+        	shownEmojis=shownEmojis+1;
+        	emojiAnimate(Math.floor((Math.random() * 4) + 1));   
+        }
+        if (value == end) {
+            clearInterval(timer);
+        }
+    }
+    
+    timer = setInterval(run, stepTime);
+    run();
+}
 
 function onTimesUp() {
   	clearInterval(timerInterval);

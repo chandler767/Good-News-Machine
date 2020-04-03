@@ -4,9 +4,9 @@ A web-app that aggregates a feed of positive news.
 [Try It Here: https://goodnews.chandlermayo.com/good-news-dashboard/dashboard.html](https://goodnews.chandlermayo.com/good-news-dashboard/dashboard.html)
 
 ## There are 3 components:
-The RSS Firehose - for creating a stream of news feeds from random sources. 
-PubNub Functions - for filtering posts by positivity, rotating featured and top posts, and handling voting.
-The Dashboard - for displaying the news feed. 
+1. The RSS Firehose - for creating a stream of news feeds from random sources. 
+2. PubNub Functions - for filtering posts by positivity, rotating featured and top posts, and handling voting.
+3. The Dashboard - for displaying the news feed. 
 
 ## RSS Firehose:
 The RSS Firehose is a Go app that randomly selects a RSS feed from a provided list of feeds and then selects a random post. The post title is checked against a list of banned words before publishing the post to PubNub. The banned word list allows for removal of posts that may be classified as positive when they are in fact not. 

@@ -1,4 +1,4 @@
-# Good-News-Machine
+# Good News Machine
 A web-app that aggregates a feed of positive news.
 
 [Try It Here: https://goodnews.chandlermayo.com/good-news-dashboard/dashboard.html](https://goodnews.chandlermayo.com/good-news-dashboard/dashboard.html)

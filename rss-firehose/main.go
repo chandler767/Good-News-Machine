@@ -92,7 +92,6 @@ func main() {
 		"sacrifices herself",
 		"sacrifices himself",
 		"fatal",
-		"bad news",
 		"sad",
 		"gun",
 		"shot",
@@ -112,6 +111,8 @@ func main() {
 		"casualty",
 		"slips",
 		"falls",
+		"bullet",
+		"bad",
 	}
 
 	config := pubnub.NewConfig()

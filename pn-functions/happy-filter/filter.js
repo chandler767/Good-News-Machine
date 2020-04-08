@@ -371,6 +371,9 @@ export default (request) => {
                             if ((currentTime - avgVoteAge) > resetVoteAvg) { // Reset vote avg.
                                 avgVoteAge = currentTime;
                                 avgVote = avgVote/2; // Reduce by 1/2 every 24 hours so that new posts can be shown in top_posts.
+                                if (avgVote > 100) {
+                                    avgVote = 100; // limit to 100
+                                }
                             }
 
                             kvstore.set(staged_vote_id, {

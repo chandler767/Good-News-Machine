@@ -350,7 +350,14 @@ export default (request) => {
                     .then(function (response) {
                         var sentiment = JSON.parse(response.body)
                         console.log(sentiment);
-                        if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish.
+                        (
+                                (sentiment.Sentiment == "POSITIVE")
+                            &&
+                                (
+                                    (sentiment.SentimentScore.Positive - sentiment.SentimentScore.Negative ) > 0.20
+                                )    
+                            
+                        ) { // Swap staged posts and publish.
                            // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
                             const staged_vote_id = hash(payload.link.toString(), "hex"); 
                             const new_featured  = {

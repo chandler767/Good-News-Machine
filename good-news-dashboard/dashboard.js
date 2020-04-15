@@ -1,7 +1,7 @@
 let currentVoteID;
 let currentVoteCount;
 
-let timeLimit = 180;
+let timeLimit = 90;
 let timePassed = 0;
 let timeLeft = timeLimit;
 let timerInterval = null;

@@ -3,6 +3,7 @@
 		<link rel="stylesheet" href="styles.css">
 		<link rel="stylesheet" href="https://use.typekit.net/smi8zdn.css">
 		<meta charset="UTF-8">
+		<title>Good News Machine</title>
 	</head>
 	<body>
 		<div id="wrapper">
@@ -18,8 +19,51 @@
 						<button onClick="publishVote('4')">🏆</button>
 					</div>
 				</div>
-				<div id="chat-content">
-					<h3>Live Chat Coming Soon!</h3>
+				<div id="chat-area">
+					<div id="chat-header">
+						<p>
+							<div id="online-count">👥 4 - Online</div>
+						</p>
+					</div>
+					<div id="chat-messages">
+						<div class="chat-message">
+							<div class="profile-circle">RM</div>
+							<div class="chat-message-head"><h3>Red Monkey</h3><p> 4:22pm</p></div>
+							<div class="chat-message-content"><p>This is a test message sent via PubNub!</p></div>
+						</div> 
+						<div class="chat-message">
+							<div class="profile-circle">PC</div>
+							<div class="chat-message-head"><h3>Purple Chicken</h3><p> 4:22pm</p></div>
+							<div class="chat-message-content"><p>This is a test message sent via PubNub!</p></div>
+						</div>
+							<div class="chat-message">
+							<div class="profile-circle">GT</div>
+							<div class="chat-message-head"><h3>Green Tiger</h3><p> 4:22pm</p></div>
+							<div class="chat-message-content"><p>This is a test message sent via PubNub!</p></div>
+						</div>
+							<div class="chat-message">
+							<div class="profile-circle">RF</div>
+							<div class="chat-message-head"><h3>Red Falcon</h3><p> 4:22pm</p></div>
+							<div class="chat-message-content"><p>This is a test message sent via PubNub!</p></div>
+						</div>
+							<div class="chat-message">
+							<div class="profile-circle">RM</div>
+							<div class="chat-message-head"><h3>Red Monkey</h3><p> 4:22pm</p></div>
+							<div class="chat-message-content"><p>This is a test message sent via PubNub!</p></div>
+						</div>
+							<div class="chat-message">
+							<div class="profile-circle">BW</div>
+							<div class="chat-message-head"><h3>Blue Wolf</h3><p> 4:23pm</p></div>
+							<div class="chat-message-content"><p>This is a test message sent via PubNub!</p></div>
+						</div>
+					</div>
+					<div id="text-area">
+						<div id="text-area-input">
+							<textarea id="chat-input" rows="2" maxlength="300" placeholder="Type a message!"></textarea>
+							<button id="emoji-button">😎</button>
+						</div>
+						<div id="typing-indicator"><p>Someone is typing...</p></div>
+					</div>
 				</div>
 			</div>
 			<div id="left-sidebar">
@@ -32,6 +76,7 @@
 		</div>
 		<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.27.4.js"></script>
 		<script src="dashboard.js"></script> 
+		<script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.0.0/dist/index.min.js"></script>
 	</body>
 </html>
 

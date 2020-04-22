@@ -137,7 +137,8 @@ function refreshPosts() {
 					if (typeof activeFeaturedPost.description != "undefined") {
 						description = truncate(activeFeaturedPost.description.replace( /(<([^>]+)>)/ig, ''), 150);
 					}
-					document.getElementById('featured-story-post').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 98)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+activeFeaturedPost.link+"</h3></a><div id=featured-votes><p>⭐ 0 Votes</p></div>";
+
+					document.getElementById('featured-story-post').innerHTML = "<a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h1>"+truncate(activeFeaturedPost.title, 98)+"</h1></a><h2>"+description+"</h2><a href=\""+activeFeaturedPost.link+"\" target=\"_blank\"><h3>"+truncate(activeFeaturedPost.link, 30)+"</h3></a><div id=featured-votes><p>⭐ 0 Votes</p></div>";
 			    	let minValue = 0
 			    	if (currentVoteCount>10){
 			    		minValue = currentVoteCount-10;
@@ -167,13 +168,12 @@ function refreshPosts() {
 	    	if (typeof topPostMessages !== "undefined" && topPostMessages.length > 0) {
 	    		let posts = [];
 				for (var i = topPostMessages.length-1; i >= 0; i--) {
-					//console.log(topPostMessages[i].entry.post.link);
 					let post_org = true;
 					for (var u = topPostMessages.length-1; u >= 0; u--) {
 						if (i != u) {
+							post_org = true; //
 							if (topPostMessages[i].entry.post.link == topPostMessages[u].entry.post.link) {
 								post_org = false;
-								//console.log("false");
 							}
 						}
 					};
@@ -358,3 +358,16 @@ function setCircleDasharray() {
     .getElementById("base-timer-path-remaining")
     .setAttribute("stroke-dasharray", circleDasharray);
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+  const button = document.querySelector('#emoji-button');
+  const picker = new EmojiButton();
+
+  picker.on('emoji', emoji => {
+    document.querySelector('#chat-input').value += emoji;
+  });
+
+  button.addEventListener('click', () => {
+    picker.togglePicker(button);
+  });
+});        

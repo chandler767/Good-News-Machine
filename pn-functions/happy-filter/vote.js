@@ -23,13 +23,13 @@ export default (request, response) => {
         });
         pubnub.publish({ message: String(emoji), channel: paramsObject.voteid }); // Stream new votes so dashboards can keep a real time count.
         response.status = 200;
-        return response.send("Vote accepted."); // (: 
+        return response.send(value.votes+1); // (: 
     }).catch((error) => {
         console.log(error);
         kvstore.set(paramsObject.voteid, {
             votes: 1
         });
         response.status = 200;
-        return response.send("Vote accepted.");
+        return response.send(1);
     });                             
 };

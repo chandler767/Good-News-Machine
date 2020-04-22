@@ -144,6 +144,7 @@ body {
     font-size: 14px;
     background: #F9FAFC 0% 0% no-repeat padding-box;
     border-radius: 0px 31px 31px 31px;
+    border: 1px solid #F79041;
     padding-left: 15px;
     padding-right: 15px;
     margin-bottom: 50px;

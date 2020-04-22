@@ -101,7 +101,7 @@ body {
 }
 
 .chat-message {
-    padding-top: 50px;
+    padding-top: 25px;
     margin: 50px 25px 100px 25px; 
     position: relative;
 }
@@ -145,6 +145,7 @@ body {
     border-radius: 0px 31px 31px 31px;
     padding-left: 15px;
     padding-right: 15px;
+    margin-bottom: 50px;
     position: absolute;
     top: 125px;
     left: 120px;

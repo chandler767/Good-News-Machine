@@ -58,7 +58,7 @@ pubnub.addListener({
 			} else {
 				shownEmoji = shownEmoji-1;
 			}
-		} else if (message.channel == "featuredchat."+currentVoteID) {
+		} else if (message.channel == "chatfeatured") {
 			let yourName = message.message.name;
 			if (yourName == myName) {
 				yourName = yourName + " (You)"
@@ -134,7 +134,9 @@ function publishVote(emoji) { // Publish vote
 
 function refreshPosts() {
 	console.log("refreshing posts");
-	pubnub.unsubscribeAll();
+	pubnub.unsubscribe({
+	    channels: [currentVoteID],
+	});
 	// Get featured post
 	pubnub.history(
 	    {
@@ -169,7 +171,7 @@ function refreshPosts() {
 			        	currentVoteCount = 0;
 			        }
 			        pubnub.subscribe({
-					    channels: [currentVoteID, isTypingChannel],
+					    channels: [currentVoteID],
 					});
 					let description = "";
 					if (typeof activeFeaturedPost.description != "undefined") {
@@ -186,46 +188,7 @@ function refreshPosts() {
 			    };
 			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
 			    request.send();
-			    pubnub.hereNow( // Update online count.
-				    {
-				        channels: ["featuredchat."+currentVoteID]
-				    },
-				    function (status, response) {
-				        document.getElementById('online-count').innerHTML = "👥 "+response.totalOccupancy+" - Online";
-				    }
-				);
-
-				// Get chat messages
-				pubnub.history(
-				    {
-				        channel: "featuredchat."+currentVoteID,
-				        reverse: false,
-				        count: 15, 
-				    },
-				    function (status, response) {
-				    	let displayed = 0;
-				    	var chatMessages = response.messages;				    	
-				    	if (typeof chatMessages !== "undefined" && chatMessages.length > 0) {
-				    		document.getElementById('chat-messages').innerHTML = "";
-							for (var i = 0; i < chatMessages.length; i++) {
-								let yourName = chatMessages[i].entry.name;
-								if (yourName == myName) {
-									yourName = yourName + " (You)"
-								}
-								let timeStamp = new Date(chatMessages[i].entry.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-								document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+chatMessages[i].entry.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+chatMessages[i].entry.message+"</p></div></div>";
-								document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
-							};
-						} else {
-							document.getElementById('chat-messages').innerHTML = "<div class=\"chat-message\"><div class=\"profile-circle\">PN</div><div class=\"chat-message-head\"><h3>PubNub</h3><p></p></div><div class=\"chat-message-content\"><p>What are you waiting for? Send the first message!</p></div></div>";
-						}
-					}
-				);
-
-			    pubnub.subscribe({
-			        channels: [("featuredchat."+currentVoteID), isTypingChannel],
-			        withPresence: true 
-			    });
+			   
 
 			    startTimer();
 			} else {
@@ -292,6 +255,47 @@ function refreshPosts() {
 	    }
 	);
 }
+
+pubnub.hereNow( // Update online count.
+    {
+        channels: ["chatfeatured"]
+    },
+    function (status, response) {
+        document.getElementById('online-count').innerHTML = "👥 "+response.totalOccupancy+" - Online";
+    }
+);
+
+// Get chat messages
+pubnub.history(
+    {
+        channel: "chatfeatured",
+        reverse: false,
+        count: 15, 
+    },
+    function (status, response) {
+    	let displayed = 0;
+    	var chatMessages = response.messages;				    	
+    	if (typeof chatMessages !== "undefined" && chatMessages.length > 0) {
+    		document.getElementById('chat-messages').innerHTML = "";
+			for (var i = 0; i < chatMessages.length; i++) {
+				let yourName = chatMessages[i].entry.name;
+				if (yourName == myName) {
+					yourName = yourName + " (You)"
+				}
+				let timeStamp = new Date(chatMessages[i].entry.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+				document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+chatMessages[i].entry.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+chatMessages[i].entry.message+"</p></div></div>";
+				document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+			};
+		} else {
+			document.getElementById('chat-messages').innerHTML = "<div class=\"chat-message\"><div class=\"profile-circle\">PN</div><div class=\"chat-message-head\"><h3>PubNub</h3><p></p></div><div class=\"chat-message-content\"><p>What are you waiting for? Send the first message!</p></div></div>";
+		}
+	}
+);
+
+pubnub.subscribe({
+    channels: ["chatfeatured", isTypingChannel],
+    withPresence: true 
+});
 
 function addToTop(posts) {
 	document.getElementById('top-story-group').innerHTML = "";
@@ -456,7 +460,7 @@ document.getElementById("chat-input").addEventListener("keydown", function (e) {
     if (e.keyCode === 13) { 
     	e.preventDefault();
 		var publishConfig = {
-			channel : "featuredchat."+currentVoteID,
+			channel : "chatfeatured",
 			message: { 
 				name: myName,
 				initials: myInitials,

@@ -15,7 +15,10 @@ export default (request, response) => {
 		return response.send(value.votes); // (:
 	}).catch((error) => {
         console.log(error);
-        response.status = 400;
-        return response.send("VoteID not found.");
+        response.status = 200;
+        kvstore.set(paramsObject.voteid, {
+            votes: 1
+        });
+        return response.send("1");
     });                             
 };

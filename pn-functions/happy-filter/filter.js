@@ -324,7 +324,7 @@ export default (request) => {
         if ((currentTime - postBuffer) >= cycleDuration) { // Only if a new post is needed.
             const payload = request.message;
             const staged_vote_id = payload.link.toString().replace(/[^\w\s]/gi, '').substring(0,50);
-            return kvstore.get(staged_vote_id+"_sentiment").then((value_s) => {
+            return kvstore.get(staged_vote_id+"-sentiment").then((value_s) => {
                 if (value_s == null) { // Must be null to check aws
                     return vault.get('AWS_access_key').then((AWS_access_key) => {
                         return vault.get('AWS_secret_key').then((AWS_secret_key) => {
@@ -356,9 +356,9 @@ export default (request) => {
                                 console.log("New Sentiment: "+sentiment.Sentiment);
 
                                 if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish.
-                                    kvstore.set(staged_vote_id+"_sentiment", { // Store positive sentiment for 1 day.
+                                    kvstore.set(staged_vote_id+"-sentiment", { // Store positive sentiment for 1 hour.
                                         sentiment: sentiment.Sentiment
-                                    }, 1440);
+                                    }, 60);
                                    // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
                                     const new_featured  = {
                                         "published": (currentTime - (currentTime - postBuffer)), // Publish when to cycle posts.
@@ -372,10 +372,6 @@ export default (request) => {
                                     console.log("New featured!")
                                     
                                     pubnub.publish({ message: new_featured, channel: "news_stream_featured" }); // Publish to featured feed.
-
-                                    kvstore.set(staged_vote_id, {
-                                        votes: 1
-                                    });
 
                                     if ((currentTime - avgVoteAge) > resetVoteAvg) { // Reset vote avg.
                                         avgVoteAge = currentTime;
@@ -424,7 +420,7 @@ export default (request) => {
                                     }
                                     return request.ok();
                                 } else {
-                                    kvstore.set(staged_vote_id+"_sentiment", { 
+                                    kvstore.set(staged_vote_id+"-sentiment", { 
                                         sentiment: sentiment.Sentiment
                                     }, 43200); // Store for other sentiment for 30 days.
                                 }

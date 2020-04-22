@@ -460,19 +460,21 @@ window.addEventListener('DOMContentLoaded', () => {
 document.getElementById("chat-input").addEventListener("keydown", function (e) {
     if (e.keyCode === 13) { 
     	e.preventDefault();
-		var publishConfig = {
+    	if (document.getElementById('chat-input').value != "") {
+    		var publishConfig = {
 			channel : "chatfeatured",
 			message: { 
-				name: myName,
-				initials: myInitials,
-				message: document.getElementById('chat-input').value,
-				time: new Date()
+					name: myName,
+					initials: myInitials,
+					message: document.getElementById('chat-input').value,
+					time: new Date()
+				}
 			}
-		}
-        pubnub.publish(publishConfig, function(status, response) {
-            console.log(status, response);
-        })
-        document.getElementById('chat-input').value = "";
+	        pubnub.publish(publishConfig, function(status, response) {
+	            console.log(status, response);
+	        })
+	        document.getElementById('chat-input').value = "";
+    	}
     }
     const inputHasText = document.getElementById("chat-input").value.length > 1;
     // Publish new PubNub signal: Typing Indicator ON (1) or OFF (2)

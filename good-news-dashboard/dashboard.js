@@ -268,7 +268,7 @@ pubnub.hereNow( // Update online count.
         channels: ["chatfeatured"]
     },
     function (status, response) {
-        document.getElementById('online-count').innerHTML = "👥 "+response.totalOccupancy+" - Online";
+        document.getElementById('online-count').innerHTML = "<span style=\"filter: hue-rotate(240deg);\">👥</span> "+response.totalOccupancy+" - Online";
     }
 );
 

@@ -59,8 +59,12 @@ pubnub.addListener({
 				shownEmoji = shownEmoji-1;
 			}
 		} else if (message.channel == "featuredchat."+currentVoteID) {
+			let yourName = message.message.name;
+			if (yourName == myName) {
+				yourName = yourName + " (You)"
+			}
 			let timeStamp = new Date(message.message.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-            document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+message.message.initials+"</div><div class=\"chat-message-head\"><h3>"+message.message.name+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+message.message.message+"</p></div></div>";
+            document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+message.message.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+message.message.message+"</p></div></div>";
 			document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
 			hideTypingIndicator();        
 		}
@@ -204,8 +208,12 @@ function refreshPosts() {
 				    	if (typeof chatMessages !== "undefined" && chatMessages.length > 0) {
 				    		document.getElementById('chat-messages').innerHTML = "";
 							for (var i = 0; i < chatMessages.length; i++) {
+								let yourName = chatMessages[i].entry.name;
+								if (yourName == myName) {
+									yourName = yourName + " (You)"
+								}
 								let timeStamp = new Date(chatMessages[i].entry.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-								document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+chatMessages[i].entry.initials+"</div><div class=\"chat-message-head\"><h3>"+chatMessages[i].entry.name+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+chatMessages[i].entry.message+"</p></div></div>";
+								document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+chatMessages[i].entry.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+chatMessages[i].entry.message+"</p></div></div>";
 								document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
 							};
 						} else {
@@ -436,6 +444,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   picker.on('emoji', emoji => {
     document.querySelector('#chat-input').value += emoji;
+    button.focus(); 
   });
 
   button.addEventListener('click', () => {

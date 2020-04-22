@@ -323,115 +323,125 @@ export default (request) => {
         }
         if ((currentTime - postBuffer) >= cycleDuration) { // Only if a new post is needed.
             const payload = request.message;
-            const staged_vote_id = payload.guid.toString().substring(0,999);
-            
+            const staged_vote_id = payload.link.toString().replace(/[^\w\s]/gi, '').substring(0,50);
             return kvstore.get(staged_vote_id+"_sentiment").then((value_s) => {
-                if (value_s != "") {
-                    //console.log("Post already checked");
-                }
-               return request.abort();
-            }).catch((error) => { // Only check if the key does not exist.
-                return vault.get('AWS_access_key').then((AWS_access_key) => {
-                    return vault.get('AWS_secret_key').then((AWS_secret_key) => {
-                        var awsCreds = {accessKeyId: AWS_access_key, secretAccessKey: AWS_secret_key};
-                        var sentimentOpts = {
-                            path: '/',
-                            service: 'comprehend',
-                            region: 'us-east-2',
-                            headers: {
-                                'Content-Type': 'application/x-amz-json-1.1',
-                                'X-Amz-Target': 'Comprehend_20171127.DetectSentiment'
-                            },
-                            host: 'comprehend.us-east-2.amazonaws.com',
-                            body: '{"Text": "' + payload.title + '", "LanguageCode":"en"}'
-                        };
-                        
-                        var s1 = signAWS(sentimentOpts, awsCreds);
-                        
-                        const sentimentHttp_options = {
-                            "method": "POST",
-                            "body": sentimentOpts.body,
-                            "headers": sentimentOpts.headers
-                        };
-                        
-                        return xhr.fetch('https://' + sentimentOpts.host, sentimentHttp_options)
-                        .then(function (response) {
-                            var sentiment = JSON.parse(response.body)
-                            console.log(sentiment);
-                            kvstore.set(staged_vote_id+"_sentiment", { // Store for 2 days.
-                                sentiment: sentiment.Sentiment
-                            }, 2880);
-                            if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish.
-                               // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
-                                const new_featured  = {
-                                    "published": (currentTime - (currentTime - postBuffer)), // Publish when to cycle posts.
-                                    "cycle": cycleDuration,
-                                    "featured": stagedPost,
-                                    "featured_vote_id": stagedPostVoteID,
-                                    "staged": payload,
-                                    "staged_post_vote_id": staged_vote_id
-                                };
+                if (value_s == null) { // Must be null to check aws
+                    return vault.get('AWS_access_key').then((AWS_access_key) => {
+                        return vault.get('AWS_secret_key').then((AWS_secret_key) => {
+                            var awsCreds = {accessKeyId: AWS_access_key, secretAccessKey: AWS_secret_key};
+                            var sentimentOpts = {
+                                path: '/',
+                                service: 'comprehend',
+                                region: 'us-east-2',
+                                headers: {
+                                    'Content-Type': 'application/x-amz-json-1.1',
+                                    'X-Amz-Target': 'Comprehend_20171127.DetectSentiment'
+                                },
+                                host: 'comprehend.us-east-2.amazonaws.com',
+                                body: '{"Text": "' + payload.title + '", "LanguageCode":"en"}'
+                            };
+                            
+                            var s1 = signAWS(sentimentOpts, awsCreds);
+                            
+                            const sentimentHttp_options = {
+                                "method": "POST",
+                                "body": sentimentOpts.body,
+                                "headers": sentimentOpts.headers
+                            };
+                            
+                            return xhr.fetch('https://' + sentimentOpts.host, sentimentHttp_options)
+                            .then(function (response) {
+                                var sentiment = JSON.parse(response.body)
                                 
-                                pubnub.publish({ message: new_featured, channel: "news_stream_featured" }); // Publish to featured feed.
+                                console.log("New Sentiment: "+sentiment.Sentiment);
 
-                                kvstore.set(staged_vote_id, {
-                                    votes: 1
-                                });
+                                if (sentiment.Sentiment == "POSITIVE") { // Swap staged posts and publish.
+                                    kvstore.set(staged_vote_id+"_sentiment", { // Store positive sentiment for 1 day.
+                                        sentiment: sentiment.Sentiment
+                                    }, 1440);
+                                   // pubnub.publish({ message: payload, channel: "news_stream_positive" }); // Publish to positive feed.
+                                    const new_featured  = {
+                                        "published": (currentTime - (currentTime - postBuffer)), // Publish when to cycle posts.
+                                        "cycle": cycleDuration,
+                                        "featured": stagedPost,
+                                        "featured_vote_id": stagedPostVoteID,
+                                        "staged": payload,
+                                        "staged_post_vote_id": staged_vote_id
+                                    };
 
-                                if ((currentTime - avgVoteAge) > resetVoteAvg) { // Reset vote avg.
-                                    avgVoteAge = currentTime;
-                                    avgVote = avgVote/2; // Reduce by 1/2 every 24 hours so that new posts can be shown in top_posts.
-                                    if (avgVote > 100) {
-                                        avgVote = 100; // limit to 100
-                                    }
-                                }
+                                    console.log("New featured!")
+                                    
+                                    pubnub.publish({ message: new_featured, channel: "news_stream_featured" }); // Publish to featured feed.
 
-                                kvstore.set('post_queue', {
-                                    post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
-                                    featured_vote_id: stagedPostVoteID,
-                                    featured_last: stagedPost,
-                                    avg_vote: avgVote,
-                                    avg_vote_age: avgVoteAge,
-                                    staged_post: payload,
-                                    staged_post_vote_id: staged_vote_id
-                                });
-
-                                if (featuredVoteID != "undefined" ) { // Check if top voted post.
-                                    return kvstore.get(featuredVoteID).then((value) => {
-                                        const featuredVotes = value.votes;
-                                        const new_top  = {
-                                            "votes": featuredVotes,
-                                            "vote_id": featuredVoteID,
-                                            "post": featuredLast,
-                                        };
-                                        if ((featuredVotes > avgVote) && (featuredVotes > 1)) { // Published to top_voted channel if higher than the average votes of the last two top voted posts.
-                                            pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
-                                            avgVote = ((avgVote + featuredVotes)/2);
-                                        }
-                                        kvstore.set('post_queue', {
-                                            post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
-                                            featured_vote_id: stagedPostVoteID,
-                                            featured_last: stagedPost,
-                                            avg_vote: avgVote,
-                                            avg_vote_age: avgVoteAge,
-                                            staged_post: payload,
-                                            staged_post_vote_id: staged_vote_id
-                                        });
-                                        return request.ok();
-                                    }).catch((error) => {
-                                        console.log(error)
-                                        return request.ok();
+                                    kvstore.set(staged_vote_id, {
+                                        votes: 1
                                     });
+
+                                    if ((currentTime - avgVoteAge) > resetVoteAvg) { // Reset vote avg.
+                                        avgVoteAge = currentTime;
+                                        avgVote = avgVote/2; // Reduce by 1/2 every 24 hours so that new posts can be shown in top_posts.
+                                        if (avgVote > 100) {
+                                            avgVote = 100; // limit to 100
+                                        }
+                                    }
+
+                                    kvstore.set('post_queue', {
+                                        post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
+                                        featured_vote_id: stagedPostVoteID,
+                                        featured_last: stagedPost,
+                                        avg_vote: avgVote,
+                                        avg_vote_age: avgVoteAge,
+                                        staged_post: payload,
+                                        staged_post_vote_id: staged_vote_id
+                                    });
+
+                                    if (featuredVoteID != "undefined" ) { // Check if top voted post.
+                                        return kvstore.get(featuredVoteID).then((value) => {
+                                            const featuredVotes = value.votes;
+                                            const new_top  = {
+                                                "votes": featuredVotes,
+                                                "vote_id": featuredVoteID,
+                                                "post": featuredLast,
+                                            };
+                                            if ((featuredVotes > avgVote) && (featuredVotes > 1)) { // Published to top_voted channel if higher than the average votes of the last two top voted posts.
+                                                pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
+                                                avgVote = ((avgVote + featuredVotes)/2);
+                                            }
+                                            kvstore.set('post_queue', {
+                                                post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.
+                                                featured_vote_id: stagedPostVoteID,
+                                                featured_last: stagedPost,
+                                                avg_vote: avgVote,
+                                                avg_vote_age: avgVoteAge,
+                                                staged_post: payload,
+                                                staged_post_vote_id: staged_vote_id
+                                            });
+                                            return request.ok();
+                                        }).catch((error) => {
+                                            console.log(error)
+                                            return request.ok();
+                                        });
+                                    }
+                                    return request.ok();
+                                } else {
+                                    kvstore.set(staged_vote_id+"_sentiment", { 
+                                        sentiment: sentiment.Sentiment
+                                    }, 43200); // Store for other sentiment for 30 days.
                                 }
                                 return request.ok();
-                            }
-                            return request.ok();
-                        }).catch(function (error) {
-                            console.log(error);
-                            return request.ok();
+                            }).catch(function (error) {
+                                console.log(error);
+                                return request.ok();
+                            });
                         });
                     });
-                });
+                } else {
+                    console.log("Stored Sentiment: "+value_s.sentiment);
+                    return request.ok();
+                }
+               return request.ok();
+            }).catch((error) => { // Only check if the key does not exist.
+                console.log(error);
                 return request.ok();
             });
         }

@@ -217,7 +217,7 @@ function refreshPosts() {
 								document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
 							};
 						} else {
-							document.getElementById('chat-messages').innerHTML = "<div class=\"chat-message\"><div class=\"profile-circle\">PN</div><div class=\"chat-message-head\"><h3>PubNub</h3><p>4:00pm</p></div><div class=\"chat-message-content\"><p>What are you waiting for? Send the first message!</p></div></div>";
+							document.getElementById('chat-messages').innerHTML = "<div class=\"chat-message\"><div class=\"profile-circle\">PN</div><div class=\"chat-message-head\"><h3>PubNub</h3><p></p></div><div class=\"chat-message-content\"><p>What are you waiting for? Send the first message!</p></div></div>";
 						}
 					}
 				);
@@ -444,7 +444,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   picker.on('emoji', emoji => {
     document.querySelector('#chat-input').value += emoji;
-    button.focus(); 
+    document.querySelector('#chat-input').get(0).focus(); 
   });
 
   button.addEventListener('click', () => {

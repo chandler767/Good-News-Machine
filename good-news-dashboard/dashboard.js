@@ -64,7 +64,7 @@ pubnub.addListener({
 				yourName = yourName + " (You)"
 			}
 			let timeStamp = new Date(message.message.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-            document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+message.message.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+message.message.message+"</p></div></div>";
+            document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+message.message.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+message.message.message.substring(0,150)+"</p></div></div>";
 			document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
 			hideTypingIndicator();        
 		}
@@ -285,7 +285,7 @@ pubnub.history(
 					yourName = yourName + " (You)"
 				}
 				let timeStamp = new Date(chatMessages[i].entry.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-				document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+chatMessages[i].entry.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+chatMessages[i].entry.message+"</p></div></div>";
+				document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+chatMessages[i].entry.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+chatMessages[i].entry.message.substring(0,150)+"</p></div></div>";
 				document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
 			};
 		} else {

@@ -6,10 +6,23 @@ let timePassed = 0;
 let timeLeft = timeLimit;
 let timerInterval = null;
 let shownEmoji = 0;
+let timeoutCache = 0;
+let isTyping = false;
+let isTypingChannel = 'is-typing';
+let typingIndicator = document.getElementById("typing-indicator");
 
 const FULL_DASH_ARRAY = 283;
 const WARNING_THRESHOLD = timeLimit/3;
 const ALERT_THRESHOLD = timeLimit/5;
+
+let [myName, myInitials] = [sessionStorage['myName'],sessionStorage['myInitials']];
+
+if (!sessionStorage['myName'] || !sessionStorage['myInitials']) {
+	[sessionStorage['myName'], sessionStorage['myInitials']] = generateName();
+	[myName, myInitials] = [sessionStorage['myName'],sessionStorage['myInitials']];
+}
+
+console.log("Hello "+myName);
 
 const COLOR_CODES = {
   info: {
@@ -29,19 +42,40 @@ let remainingPathColor = COLOR_CODES.info.color;
 
 var pubnub = new PubNub({
 	publishKey: "pub-c-aac19938-466b-4d89-8a61-ba29ec3b4149",
-	subscribeKey: "sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302"
+	subscribeKey: "sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302",
+	uuid: myName,
+	presenceTimeout: 90,
 })
 
 pubnub.addListener({
 	message: function(message) {
-		currentVoteCount = parseInt(currentVoteCount, 10)+1;
-		document.getElementById('featured-votes').innerHTML = "<p>⭐ "+currentVoteCount+" Votes</p>";
-		if (shownEmoji == 0) {
-			emojiAnimate(message.message);
-		} else {
-			shownEmoji = shownEmoji-1;
+		console.log(message);
+		if (message.channel == currentVoteID) {
+			currentVoteCount = parseInt(currentVoteCount, 10)+1;
+			document.getElementById('featured-votes').innerHTML = "<p>⭐ "+currentVoteCount+" Votes</p>";
+			if (shownEmoji == 0) {
+				emojiAnimate(message.message);
+			} else {
+				shownEmoji = shownEmoji-1;
+			}
+		} else if (message.channel == "featuredchat."+currentVoteID) {
+			let timeStamp = new Date(message.message.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+            document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+message.message.initials+"</div><div class=\"chat-message-head\"><h3>"+message.message.name+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+message.message.message+"</p></div></div>";
+			document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+			hideTypingIndicator();        
 		}
 	},
+	presence: function(presenceEvent) {
+		document.getElementById('online-count').innerHTML = "👥 "+presenceEvent.occupancy+" - Online";
+	},
+	signal: function(s) {
+        clearTimeout(timeoutCache);
+        typingIndicator.style = "";
+        timeoutCache = setTimeout(hideTypingIndicator, 10000) // 10 seconds
+        if (s.message === '0') {
+            hideTypingIndicator();
+        }
+    },
 })
 
 function emojiAnimate(emoji){
@@ -131,7 +165,7 @@ function refreshPosts() {
 			        	currentVoteCount = 0;
 			        }
 			        pubnub.subscribe({
-					    channels: [currentVoteID],
+					    channels: [currentVoteID, isTypingChannel],
 					});
 					let description = "";
 					if (typeof activeFeaturedPost.description != "undefined") {
@@ -144,9 +178,46 @@ function refreshPosts() {
 			    		minValue = currentVoteCount-10;
 			    	}
 			    	animateValue("featured-votes", minValue, currentVoteCount, 500);
+
 			    };
 			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
 			    request.send();
+			    pubnub.hereNow( // Update online count.
+				    {
+				        channels: ["featuredchat."+currentVoteID]
+				    },
+				    function (status, response) {
+				        document.getElementById('online-count').innerHTML = "👥 "+response.totalOccupancy+" - Online";
+				    }
+				);
+
+				// Get chat messages
+				pubnub.history(
+				    {
+				        channel: "featuredchat."+currentVoteID,
+				        reverse: false,
+				        count: 15, 
+				    },
+				    function (status, response) {
+				    	let displayed = 0;
+				    	var chatMessages = response.messages;				    	
+				    	if (typeof chatMessages !== "undefined" && chatMessages.length > 0) {
+				    		document.getElementById('chat-messages').innerHTML = "";
+							for (var i = 0; i < chatMessages.length; i++) {
+								let timeStamp = new Date(chatMessages[i].entry.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+								document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+chatMessages[i].entry.initials+"</div><div class=\"chat-message-head\"><h3>"+chatMessages[i].entry.name+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+chatMessages[i].entry.message+"</p></div></div>";
+								document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
+							};
+						} else {
+							document.getElementById('chat-messages').innerHTML = "<div class=\"chat-message\"><div class=\"profile-circle\">PN</div><div class=\"chat-message-head\"><h3>PubNub</h3><p>4:00pm</p></div><div class=\"chat-message-content\"><p>What are you waiting for? Send the first message!</p></div></div>";
+						}
+					}
+				);
+
+			    pubnub.subscribe({
+			        channels: [("featuredchat."+currentVoteID), isTypingChannel],
+			        withPresence: true 
+			    });
 
 			    startTimer();
 			} else {
@@ -370,4 +441,59 @@ window.addEventListener('DOMContentLoaded', () => {
   button.addEventListener('click', () => {
     picker.togglePicker(button);
   });
-});        
+});
+
+document.getElementById("chat-input").addEventListener("keydown", function (e) {
+    if (e.keyCode === 13) { 
+    	e.preventDefault();
+		var publishConfig = {
+			channel : "featuredchat."+currentVoteID,
+			message: { 
+				name: myName,
+				initials: myInitials,
+				message: document.getElementById('chat-input').value,
+				time: new Date()
+			}
+		}
+        pubnub.publish(publishConfig, function(status, response) {
+            console.log(status, response);
+        })
+        document.getElementById('chat-input').value = "";
+    }
+    const inputHasText = document.getElementById("chat-input").value.length > 1;
+    // Publish new PubNub signal: Typing Indicator ON (1) or OFF (2)
+    if ((inputHasText && !isTyping) || (!inputHasText && isTyping)) {
+        isTyping = !isTyping;
+        pubnub.signal({
+            channel: isTypingChannel,
+            message: inputHasText ? '1' : '0'
+        });
+    }
+});
+
+function capFirst(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function getRandomInt(min, max) {
+  	return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function generateName(){
+
+	var name1 = ["adaptable", "adventurous", "affable", "affectionate", "agreeable", "ambitious", "amiable", "amicable", "amusing", "brave", "bright", "calm", "careful", "charming", "communicative", "compassionate", "considerate", "convivial", "courageous", "courteous", "creative", "decisive", "determined", "diligent", "diplomatic", "discreet", "dynamic", "easygoing", "emotional", "energetic", "enthusiastic", "exuberant", "faithful", "fearless", "forceful", "frank", "friendly", "funny", "generous", "gentle", "good", "gregarious", "helpful", "honest", "humorous", "imaginative", "impartial", "independent", "intellectual", "intelligent", "intuitive", "inventive", "kind", "loving", "loyal", "modest", "neat", "nice", "optimistic", "passionate", "patient", "persistent", "pioneering", "polite", "powerful", "practical", "reliable", "reserved", "resourceful", "romantic", "sensible", "sincere", "sociable", "sympathetic", "thoughtful", "tidy", "tough", "unassuming", "understanding", "versatile", "warmhearted", "willing", "witty"];
+
+	var name2 = ["alligator", "ant", "bear", "bee", "bird", "camel", "cat", "cheetah", "chicken", "chimpanzee", "cow", "crocodile", "deer", "dog", "dolphin", "duck", "eagle", "elephant", "fish", "fly", "fox", "frog", "giraffe", "goat", "goldfish", "hamster", "hippopotamus", "horse", "kangaroo", "kitten", "lion", "lobster", "monkey", "octopus", "owl", "panda", "pig", "puppy", "rabbit", "rat", "scorpion", "seal", "shark", "sheep", "snail", "snake", "spider", "squirrel", "tiger", "turtle", "wolf", "zebra"];
+
+	var first = capFirst(name1[getRandomInt(1, name1.length)]);
+
+	var last = capFirst(name2[getRandomInt(1, name2.length)]);
+
+	return [(first + ' ' + last), (first.charAt(0)+last.charAt(0))];
+
+}
+
+let hideTypingIndicator = () => {
+	isTyping = false;
+	typingIndicator.style = "visibility:hidden;";
+}

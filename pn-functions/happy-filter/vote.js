@@ -8,23 +8,23 @@ export default (request, response) => {
     let emoji = "";
 
     if (paramsObject.voteid == "undefined") {
- 		console.log("request with no voteid");
+        console.log("request with no voteid");
         response.status = 400;
         return response.send("Missing voteid.");
     }
 
     if (paramsObject.emoji != "undefined") {
- 		emoji = paramsObject.emoji;
+        emoji = paramsObject.emoji;
     }
 
-   	return kvstore.get(paramsObject.voteid).then((value) => {
+    return kvstore.get(paramsObject.voteid).then((value) => {
         kvstore.set(paramsObject.voteid, { 
-        	votes:(value.votes+1) // Count vote
+            votes:(value.votes+1) // Count vote
         });
         pubnub.publish({ message: String(emoji), channel: paramsObject.voteid }); // Stream new votes so dashboards can keep a real time count.
         response.status = 200;
-		return response.send("Vote accepted."); // (: 
-	}).catch((error) => {
+        return response.send("Vote accepted."); // (: 
+    }).catch((error) => {
         console.log(error);
         response.status = 400;
         return response.send("VoteID not found.");

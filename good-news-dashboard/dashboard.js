@@ -215,7 +215,6 @@ function refreshPosts() {
 					let post_org = true;
 					for (var u = topPostMessages.length-1; u >= 0; u--) {
 						if (i != u) {
-							post_org = true; //
 							if (topPostMessages[i].entry.post.link == topPostMessages[u].entry.post.link) {
 								post_org = false;
 							}

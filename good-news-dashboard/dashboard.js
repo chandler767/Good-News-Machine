@@ -128,16 +128,14 @@ function animateUp(elem) {
 
 function publishVote(emoji) { // Publish vote
 	let request = new XMLHttpRequest();
-	request.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-        	if (this.responseText > currentVoteCount) {
-        		currentVoteCount = this.responseText;
-        		document.getElementById('featured-votes').innerHTML = "<p>⭐ "+currentVoteCount+" Votes</p>";
-        	}
-        }
-     };
     request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/vote?voteid='+currentVoteID+'&emoji='+emoji);
     request.send();
+    request.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+    		currentVoteCount = this.responseText;
+    		document.getElementById('featured-votes').innerHTML = "<p>⭐ "+currentVoteCount+" Votes</p>";
+        }
+     };
     shownEmoji = shownEmoji+1;
     emojiAnimate(emoji);   
 };

@@ -141,7 +141,7 @@ func main() {
 				}
 			}
 		}
-		time.Sleep(time.Duration(rand.Int31n(800-300)+300) * time.Millisecond) // Random delay to slow things down.
+		time.Sleep(time.Duration(rand.Int31n(300-100)+100) * time.Millisecond) // Random delay to slow things down.
 	}
 }
 

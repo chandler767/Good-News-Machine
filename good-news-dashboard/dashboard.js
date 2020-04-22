@@ -74,10 +74,12 @@ pubnub.addListener({
 	},
 	signal: function(s) {
         clearTimeout(timeoutCache);
-        typingIndicator.style = "";
-        timeoutCache = setTimeout(hideTypingIndicator, 10000) // 10 seconds
-        if (s.message === '0') {
-            hideTypingIndicator();
+        if (s.publisher != myName) {
+        	typingIndicator.style = "";
+	        timeoutCache = setTimeout(hideTypingIndicator, 10000) // 10 seconds
+	        if (s.message === '0') {
+	            hideTypingIndicator();
+	        }
         }
     },
 })

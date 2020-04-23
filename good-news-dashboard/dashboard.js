@@ -59,12 +59,12 @@ pubnub.addListener({
 				shownEmoji = shownEmoji-1;
 			}
 		} else if (message.channel == "chatfeatured") {
-			let yourName = message.message.name;
-			if (yourName == myName) {
-				yourName = yourName + " (You)"
+			let messageName = message.message.name;
+			if (messageName == myName) {
+				messageName = messageName + " (You)"
 			}
 			let timeStamp = new Date(message.message.time).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-            document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+message.message.initials+"</div><div class=\"chat-message-head\"><h3>"+yourName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+message.message.message.substring(0,150)+"</p></div></div>";
+            document.getElementById('chat-messages').innerHTML = document.getElementById('chat-messages').innerHTML + "<div class=\"chat-message\"><div class=\"profile-circle\">"+message.message.initials+"</div><div class=\"chat-message-head\"><h3>"+messageName+"</h3><p>"+timeStamp+"</p></div><div class=\"chat-message-content\"><p>"+message.message.message.substring(0,150)+"</p></div></div>";
 			document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
 			hideTypingIndicator();        
 		}
@@ -217,26 +217,18 @@ function refreshPosts() {
 	    	var topPostMessages = response.messages;
 	    	if (typeof topPostMessages !== "undefined" && topPostMessages.length > 0) {
 	    		let posts = [];
+	    		let postsNew = [];
 				for (var i = topPostMessages.length-1; i >= 0; i--) {
-					let post_org = true;
-					for (var u = topPostMessages.length-1; u >= 0; u--) {
-						if (i != u) {
-							if (topPostMessages[i].entry.post.link == topPostMessages[u].entry.post.link) {
-								post_org = false;
-							}
-						}
-					};
-					if (post_org != false) {
-						if (displayed < 5) {
-							currentPost = topPostMessages[i].entry;
-							if (currentPost.vote_id != currentVoteID) {
+					if (displayed < 5) {
+						currentPost = topPostMessages[i].entry;
+						if (currentPost.vote_id != currentVoteID) {
+							if (!(postsNew.find(a =>a.includes(currentPost.vote_id)))) {
 								displayed = displayed+1;
 								let description = "";
 								if (currentPost.post.description !== undefined) {
 									description = truncate(currentPost.post.description.replace( /(<([^>]+)>)/ig, ''), 150);
 								}
 								let title = truncate(currentPost.post.title, 98);
-								let link = currentPost.post.link;
 								let votes = currentPost.votes;
 								let request = new XMLHttpRequest();
 							    request.onreadystatechange = function() {
@@ -246,12 +238,13 @@ function refreshPosts() {
 							            if (postVoteCount < votes) { // The object may have been removed from history. 
 							            	postVoteCount = votes;
 							            }
-							            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+link+"\" target=\"_blank\">"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
+							            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+currentPost.post.link+"\" target=\"_blank\">"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
 							        	addToTop(posts.sort(function(a,b) {
 											return a[0]-b[0]
 										}));
 							        }
 							    };
+							    postsNew.push(currentPost.vote_id);
 							    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentPost.vote_id);
 							    request.send();
 							}

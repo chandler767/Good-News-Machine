@@ -210,7 +210,7 @@ function refreshPosts() {
 	    {
 	        channel: 'top_voted',
 	        reverse: false,
-	        count: 15, // how many items to fetch
+	        count: 10, // how many items to fetch
 	    },
 	    function (status, response) {
 	    	let displayed = 0;

@@ -196,8 +196,6 @@ function refreshPosts() {
 			    };
 			    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentVoteID);
 			    request.send();
-			   
-
 			    startTimer();
 			} else {
 				document.getElementById('featured-story-post').innerHTML = "<h1>Unable to get featured post ):</h1>";
@@ -219,35 +217,36 @@ function refreshPosts() {
 	    		let posts = [];
 	    		let postsNew = [];
 				for (var i = topPostMessages.length-1; i >= 0; i--) {
-					if (displayed < 5) {
-						currentPost = topPostMessages[i].entry;
-						if (currentPost.vote_id != currentVoteID) {
-							if (!(postsNew.find(a =>a.includes(currentPost.vote_id)))) {
-								displayed = displayed+1;
-								let description = "";
-								if (currentPost.post.description !== undefined) {
-									description = truncate(currentPost.post.description.replace( /(<([^>]+)>)/ig, ''), 150);
-								}
-								let title = truncate(currentPost.post.title, 98);
-								let votes = currentPost.votes;
-								let request = new XMLHttpRequest();
-							    request.onreadystatechange = function() {
-							    	let postVoteCount = 0;
-							        if (this.readyState == 4 && this.status == 200) {
-							            postVoteCount = this.responseText;
-							            if (postVoteCount < votes) { // The object may have been removed from history. 
-							            	postVoteCount = votes;
-							            }
-							            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+currentPost.post.link+"\" target=\"_blank\">"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
-							        	addToTop(posts.sort(function(a,b) {
-											return a[0]-b[0]
-										}));
-							        }
-							    };
-							    postsNew.push(currentPost.vote_id);
-							    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentPost.vote_id);
-							    request.send();
+					if (displayed >= 5) {
+						return;
+					}
+					currentPost = topPostMessages[i].entry;
+					if (currentPost.vote_id != currentVoteID) {
+						if (!(postsNew.find(a =>a.includes(currentPost.vote_id)))) {
+							displayed = displayed+1;
+							let description = "";
+							if (currentPost.post.description !== undefined) {
+								description = truncate(currentPost.post.description.replace( /(<([^>]+)>)/ig, ''), 150);
 							}
+							let title = truncate(currentPost.post.title, 98);
+							let votes = currentPost.votes;
+							let request = new XMLHttpRequest();
+						    request.onreadystatechange = function() {
+						    	let postVoteCount = 0;
+						        if (this.readyState == 4 && this.status == 200) {
+						            postVoteCount = this.responseText;
+						            if (postVoteCount < votes) { // The object may have been removed from history. 
+						            	postVoteCount = votes;
+						            }
+						            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+currentPost.post.link+"\" target=\"_blank\">"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
+						        	addToTop(posts.sort(function(a,b) {
+										return a[0]-b[0];
+									}));
+						        }
+						    };
+						    postsNew.push(currentPost.vote_id);
+						    request.open('GET', 'https://ps.pndsn.com/v1/blocks/sub-key/sub-c-0b04217e-6f8c-11ea-bbe3-3ec3e5ef3302/count?voteid='+currentPost.vote_id);
+						    request.send();
 						}
 					}
 				}

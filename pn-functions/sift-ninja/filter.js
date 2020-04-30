@@ -27,7 +27,11 @@ export default (request) => {
     message.message = sanitize(message.message);
     
     if (message.message == null) {
-        return request.ok(message);
+        request.abort();
+    }
+
+    if (message.message.toString().trim() == "") {
+        request.abort();
     }
 
     // Build the request to send to Sift Ninja

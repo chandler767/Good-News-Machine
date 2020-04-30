@@ -401,7 +401,8 @@ export default (request) => {
                                             };
                                             if ((featuredVotes > avgVote) && (featuredVotes > 1)) { // Published to top_voted channel if higher than the average votes of the last two top voted posts.
                                                 pubnub.publish({ message: new_top, channel: "top_voted" }); // Publish to top_voted
-                                                avgVote = ((avgVote + featuredVotes)/2);
+                                                //avgVote = ((avgVote + featuredVotes)/2);
+                                                avgVote = featuredVotes;
                                             }
                                             kvstore.set('post_queue', {
                                                 post_buffer: ((currentTime - (currentTime - postBuffer)) + cycleDuration), // How often to stage a new post to be featured.

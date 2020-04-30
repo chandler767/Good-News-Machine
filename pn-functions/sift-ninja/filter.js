@@ -14,7 +14,7 @@ export default (request) => {
     const channelName = "pubnub_block";
 
     // Your Sift Ninja API key
-    const apiKey = "";
+    const apiKey = "30f8f0e45e2a16f51c6d02e5039203ce";
 
     // End of configuration ------------------------
 
@@ -24,6 +24,7 @@ export default (request) => {
     const authorization = basicAuth.basic(accountName + '/' + channelName,apiKey);
 
     let message = request.message;
+    message.message = sanitize(message.message);
     
     if (message.message == null) {
         return request.ok(message);
@@ -66,3 +67,16 @@ export default (request) => {
     });
 
 };
+
+function sanitize(string) {
+  const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#x27;',
+      "/": '&#x2F;',
+  };
+  const reg = /[&<>"'/]/ig;
+  return string.toString().replace(reg, (match)=>(map[match]));
+}

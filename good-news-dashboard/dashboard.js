@@ -230,6 +230,7 @@ function refreshPosts() {
 							}
 							let title = truncate(currentPost.post.title, 98);
 							let votes = currentPost.votes;
+							let link = currentPost.post.link;
 							let request = new XMLHttpRequest();
 						    request.onreadystatechange = function() {
 						    	let postVoteCount = 0;
@@ -238,7 +239,7 @@ function refreshPosts() {
 						            if (postVoteCount < votes) { // The object may have been removed from history. 
 						            	postVoteCount = votes;
 						            }
-						            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+currentPost.post.link+"\" target=\"_blank\">"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
+						            posts.push([Number(postVoteCount), "<div class=\"top-story\"><h2><a href=\""+link+"\" target=\"_blank\">"+title+"</a></h2><h3>"+description+"</h3><p>⭐ "+postVoteCount+" Votes</p></div>"]);
 						        	addToTop(posts.sort(function(a,b) {
 										return a[0]-b[0];
 									}));
